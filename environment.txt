@@ -1,0 +1,4 @@
+pyautogui==0.9.54
+pyperclip==1.8.2
+pandas==2.1.2
+openpyxl== 3.1.2
