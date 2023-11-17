@@ -38,7 +38,7 @@ class CommandLineInteractionLayer(InteractionLayer):
                 continue
             select_path = scripts[select_script_index].path
             loader: ScriptLoader = ExcelLoader()
-            key_script: KeyScript = loader.loads(select_path)
+            key_scripts: list[KeyScript] = loader.loads(select_path)
             executor: ScriptExecutor = SimpleExecutor(scripts[select_script_index])
-            executor.execute(key_script)
+            executor.execute(key_scripts)
             print('脚本执行完毕')

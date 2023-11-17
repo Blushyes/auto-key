@@ -21,7 +21,7 @@ def _get_col(df: DataFrame, col_index: int) -> list:
 
 class ExcelLoader(ScriptLoader):
 
-    def loads(self, path: str) -> KeyScript:
+    def loads(self, path: str) -> list[KeyScript]:
         files = os.listdir(path)
         scripts = [file for file in files if SCRIPT_NAME in file]
         if len(scripts) == 0:
@@ -44,4 +44,5 @@ class ExcelLoader(ScriptLoader):
         commands: list = _get_col(df, 0)
         contents: list = _get_col(df, 1)
         jump_list: list = _get_col(df, 2)
-        return KeyScript(commands, contents, jump_list)
+
+        return [KeyScript(command, content, jump) for command, content, jump in zip(commands, contents, jump_list)]

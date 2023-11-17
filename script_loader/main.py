@@ -15,9 +15,9 @@ with open(METADATA_EXAMPLE_PATH, 'r', encoding='utf-8') as f:
 
 @dataclass
 class KeyScript:
-    commands: list[int]
-    contents: list[str]
-    jump_list: list[int]  # 如果没有设置，则默认为-1
+    command: int
+    content: str
+    jump_to: int = field(default=-1)
 
 
 @dataclass
@@ -34,7 +34,7 @@ class ScriptLoader:
     脚本加载器
     """
 
-    def loads(self, path: str) -> KeyScript:
+    def loads(self, path: str) -> list[KeyScript]:
         """
         加载按键脚本
 
