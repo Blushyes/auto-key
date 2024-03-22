@@ -19,9 +19,11 @@ class CommandType:
 
 def _get_pos(img: str):
     image = Image.open(img)
-    while pyautogui.locateCenterOnScreen(image, confidence=.9) is None:
-        print('waiting...')
-    return pyautogui.locateCenterOnScreen(image, confidence=.9)
+    while True:
+        try:
+            return pyautogui.locateCenterOnScreen(image, confidence=.9)
+        except pyautogui.ImageNotFoundException:
+            print(f"未找到图片：{image}")
 
 
 class SimpleExecutor(ScriptExecutor):
