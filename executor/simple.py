@@ -23,7 +23,7 @@ def _get_pos(img: str):
         try:
             return pyautogui.locateCenterOnScreen(image, confidence=.9)
         except pyautogui.ImageNotFoundException:
-            print(f"未找到图片：{image}")
+            print(f"未在屏幕区域匹配到与 {img} 相同的图片")
 
 
 class SimpleExecutor(ScriptExecutor):
