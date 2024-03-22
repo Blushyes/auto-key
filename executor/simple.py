@@ -35,23 +35,27 @@ class SimpleExecutor(ScriptExecutor):
         while i < len(scripts):
             script: KeyScript = scripts[i]
             print(i, script.command)
-            match script.command:
-                case CommandType.SINGLE_CLICK:
-                    x, y = _get_pos(os.path.join(self._script_info.path, script.content))
-                    pyautogui.click(x, y, interval=.2, duration=.2)
-                case CommandType.DOUBLE_CLICK:
-                    x, y = _get_pos(os.path.join(self._script_info.path, script.content))
-                    pyautogui.click(x, y, interval=.2, duration=.2, clicks=2)
-                case CommandType.RIGHT_CLICK:
-                    x, y = _get_pos(os.path.join(self._script_info.path, script.content))
-                    pyautogui.click(x, y, interval=.2, duration=.2, button='right')
-                case CommandType.INPUT:
-                    pyperclip.copy(script.content)
-                    pyautogui.hotkey('ctrl', 'v')
-                case CommandType.WAIT:
-                    pass
-                case CommandType.SCROLL:
-                    pyautogui.scroll(int(script.content))
+            try:
+                match script.command:
+                    case CommandType.SINGLE_CLICK:
+                        x, y = _get_pos(os.path.join(self._script_info.path, script.content))
+                        pyautogui.click(x, y, interval=.2, duration=.2)
+                    case CommandType.DOUBLE_CLICK:
+                        x, y = _get_pos(os.path.join(self._script_info.path, script.content))
+                        pyautogui.click(x, y, interval=.2, duration=.2, clicks=2)
+                    case CommandType.RIGHT_CLICK:
+                        x, y = _get_pos(os.path.join(self._script_info.path, script.content))
+                        pyautogui.click(x, y, interval=.2, duration=.2, button='right')
+                    case CommandType.INPUT:
+                        pyperclip.copy(script.content)
+                        pyautogui.hotkey('ctrl', 'v')
+                    case CommandType.WAIT:
+                        pass
+                    case CommandType.SCROLL:
+                        pyautogui.scroll(int(script.content))
+            except pyautogui.FailSafeException:
+                print("鼠标移动到屏幕左上边缘，触发了安全保护，脚本执行已停止。")
+                return
             if script.jump_to == -1:
                 i += 1
             else:
