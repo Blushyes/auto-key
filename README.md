@@ -10,7 +10,7 @@
 2. 安装所需的库
    ```shell
    python.exe -m pip install --upgrade pip
-   pip install -r environment.txt
+   pip install -r requirements.txt
    ```
 
 ## 使用方法
@@ -37,10 +37,10 @@
 ├─📜main.py  # 运行命令行版 auto-key
 ├─📜main_gui.py  # 运行图形界面版 auto-key
 ├─✏️README.md
+├─✏️requirements.txt  # 依赖库
 ├─📁 scripts/  # 脚本存放处
 ├─📁 context/
 │ ├─📜logging.py
-├─✏️environment.txt
 ├─📁 executor/  # 规定了脚本执行器接口
 │ ├─📜cosmic.py  # 需要跨模块访问的变量值，可以在这里 修改快捷键按键设置
 │ ├─📜main.py
