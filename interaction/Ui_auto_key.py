@@ -8,16 +8,42 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QHBoxLayout, QLabel,
-    QPlainTextEdit, QPushButton, QSizePolicy, QSpinBox,
-    QTabWidget, QTextEdit, QVBoxLayout, QWidget)
+from PySide6.QtCore import (QCoreApplication, QMetaObject)
+from PySide6.QtWidgets import (QComboBox, QHBoxLayout, QLabel,
+                               QPlainTextEdit, QPushButton, QSizePolicy, QSpinBox,
+                               QTabWidget, QTextEdit, QVBoxLayout, QWidget)
+
+ABOUT_MARKDOWN_WRAPPER = u'''
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta name="qrichtext" content="1"/>
+    <meta charset="utf-8"/>
+    <style>
+      p, li {
+        white-space: pre-wrap;
+      }
+
+      hr {
+        height: 1px;
+        border-width: 0;
+      }
+
+      li.unchecked::marker {
+        content: "\\2610";
+      }
+
+      li.checked::marker {
+        content: "\\2612";
+      }
+    </style>
+</head>
+<body style=" font-family:'Microsoft YaHei UI', sans-serif; font-size:9pt; font-weight:400; font-style:normal;">
+<p style="-qt-paragraph-type:empty; margin: 12px 0px;-qt-block-indent:0; text-indent:0px;"><br/></p>
+</body>
+</html>
+'''
+
 
 class Ui_auto_key(object):
     def setupUi(self, auto_key):
@@ -77,7 +103,6 @@ class Ui_auto_key(object):
 
         self.horizontalLayout_2.addWidget(self.spinBox_redo_times)
 
-
         self.verticalLayout.addLayout(self.horizontalLayout_2)
 
         self.pushButton_run_script = QPushButton(self.tab_main)
@@ -108,7 +133,6 @@ class Ui_auto_key(object):
         self.pushButton_open_script_folder.setObjectName(u"pushButton_open_script_folder")
 
         self.horizontalLayout.addWidget(self.pushButton_open_script_folder)
-
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
@@ -143,36 +167,37 @@ class Ui_auto_key(object):
 
         self.verticalLayout_2.addWidget(self.tabWidget)
 
-
         self.retranslateUi(auto_key)
 
         self.tabWidget.setCurrentIndex(0)
 
-
         QMetaObject.connectSlotsByName(auto_key)
+
     # setupUi
 
     def retranslateUi(self, auto_key):
         auto_key.setWindowTitle(QCoreApplication.translate("auto_key", u"auto-key", None))
         self.label_welcome.setText(QCoreApplication.translate("auto_key", u"\u6b22\u8fce\u4f7f\u7528auto-key", None))
-        self.label_script_list.setText(QCoreApplication.translate("auto_key", u"\u83b7\u53d6\u5230\u7684\u811a\u672c\u6709", None))
-        self.label_ask_to_select_script.setText(QCoreApplication.translate("auto_key", u"\u8bf7\u95ee\u4f60\u8981\u6267\u884c\u54ea\u4e2a\u811a\u672c\u5462\uff1f", None))
+        self.label_script_list.setText(
+            QCoreApplication.translate("auto_key", u"\u83b7\u53d6\u5230\u7684\u811a\u672c\u6709", None))
+        self.label_ask_to_select_script.setText(QCoreApplication.translate("auto_key",
+                                                                           u"\u8bf7\u95ee\u4f60\u8981\u6267\u884c\u54ea\u4e2a\u811a\u672c\u5462\uff1f",
+                                                                           None))
         self.label_redo_times.setText(QCoreApplication.translate("auto_key", u"\u6267\u884c\u6b21\u6570", None))
         self.pushButton_run_script.setText(QCoreApplication.translate("auto_key", u"\u8fd0\u884c\u811a\u672c(F6)", None))
         self.pushButton_pause_script.setText(QCoreApplication.translate("auto_key", u"\u6682\u505c\u811a\u672c(F9 / \u9f20\u6807\u79fb\u81f3\u5c4f\u5e55\u5de6\u4e0a\u89d2)", None))
         self.pushButton_edit_script.setText(QCoreApplication.translate("auto_key", u"\u7f16\u8f91\u811a\u672c", None))
-        self.pushButton_open_script_folder.setText(QCoreApplication.translate("auto_key", u"\u6253\u5f00\u811a\u672c\u6587\u4ef6\u5939", None))
+        self.pushButton_open_script_folder.setText(
+            QCoreApplication.translate("auto_key", u"\u6253\u5f00\u811a\u672c\u6587\u4ef6\u5939", None))
         self.pushButton_exit.setText(QCoreApplication.translate("auto_key", u"\u9000\u51fa\u7a0b\u5e8f", None))
-        self.label_script_execute_status.setText(QCoreApplication.translate("auto_key", u"\u811a\u672c\u8fd0\u884c\u72b6\u6001", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_main), QCoreApplication.translate("auto_key", u"\u4e3b\u754c\u9762", None))
-        self.textEdit_about.setHtml(QCoreApplication.translate("auto_key", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"hr { height: 1px; border-width: 0; }\n"
-"li.unchecked::marker { content: \"\\2610\"; }\n"
-"li.checked::marker { content: \"\\2612\"; }\n"
-"</style></head><body style=\" font-family:'Microsoft YaHei UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_about), QCoreApplication.translate("auto_key", u"\u5173\u4e8e", None))
-    # retranslateUi
+        self.label_script_execute_status.setText(
+            QCoreApplication.translate("auto_key", u"\u811a\u672c\u8fd0\u884c\u72b6\u6001", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_main),
+                                  QCoreApplication.translate("auto_key", u"\u4e3b\u754c\u9762", None))
 
+        self.textEdit_about.setHtml(QCoreApplication.translate("auto_key",
+                                                               ABOUT_MARKDOWN_WRAPPER,
+                                                               None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_about),
+                                  QCoreApplication.translate("auto_key", u"\u5173\u4e8e", None))
+    # retranslateUi
