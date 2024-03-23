@@ -1,11 +1,10 @@
-import os
-
 import pyautogui
 import pyperclip
 from PIL import Image
 
 from executor.main import ScriptExecutor
 from script_loader.main import KeyScript, ScriptInfo
+from pathlib import Path
 
 
 class CommandType:
@@ -17,13 +16,13 @@ class CommandType:
     SCROLL = 6
 
 
-def _get_pos(img: str):
-    image = Image.open(img)
+def _get_pos(img_path: Path):
+    image = Image.open(img_path)
     while True:
         try:
             return pyautogui.locateCenterOnScreen(image, confidence=.9)
         except pyautogui.ImageNotFoundException:
-            print(f"未在屏幕区域匹配到与 {img} 相同的图片")
+            print(f"未在屏幕区域匹配到与 {img_path} 相同的图片")
 
 
 class SimpleExecutor(ScriptExecutor):
@@ -38,13 +37,13 @@ class SimpleExecutor(ScriptExecutor):
             try:
                 match script.command:
                     case CommandType.SINGLE_CLICK:
-                        x, y = _get_pos(os.path.join(self._script_info.path, script.content))
+                        x, y = _get_pos(Path(self._script_info.path) / script.content)
                         pyautogui.click(x, y, interval=.2, duration=.2)
                     case CommandType.DOUBLE_CLICK:
-                        x, y = _get_pos(os.path.join(self._script_info.path, script.content))
+                        x, y = _get_pos(Path(self._script_info.path) / script.content)
                         pyautogui.click(x, y, interval=.2, duration=.2, clicks=2)
                     case CommandType.RIGHT_CLICK:
-                        x, y = _get_pos(os.path.join(self._script_info.path, script.content))
+                        x, y = _get_pos(Path(self._script_info.path) / script.content)
                         pyautogui.click(x, y, interval=.2, duration=.2, button='right')
                     case CommandType.INPUT:
                         pyperclip.copy(script.content)

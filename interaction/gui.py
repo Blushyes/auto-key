@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 from executor.main import ScriptExecutor
 from executor.simple import SimpleExecutor
 from script_loader.excel_loader import ExcelLoader
@@ -126,7 +127,7 @@ class GuiInteractionLayer(QWidget):
         
         # 获取用户输入的脚本序号
         # 因为显示时从 1 开始计数，所以需要减 1
-        self.select_path = self.scripts_list[self.select_script_index - 1].path
+        self.select_path = Path(self.scripts_list[self.select_script_index - 1].path)
 
 
 
@@ -173,7 +174,7 @@ class GuiInteractionLayer(QWidget):
     def edit_script(self) -> None:
         self.get_select_path()
         # 拼接 index.xlsx 路径
-        self.xlsx_path = os.path.join(self.select_path, 'index.xlsx')
+        self.xlsx_path = self.select_path / 'index.xlsx'
         # 打开脚本文件
         os.system(f'start excel {self.xlsx_path}')
 

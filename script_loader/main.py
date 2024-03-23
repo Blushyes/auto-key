@@ -1,13 +1,16 @@
 import json
 import os
+import pathlib
 from dataclasses import dataclass, field
 from typing import Optional
 
 from context.logging import logger
 
-SCRIPT_DIR: str = 'scripts'
-METADATA_NAME: str = 'meta.json'
-METADATA_EXAMPLE_PATH: str = os.path.join(SCRIPT_DIR, 'meta.example.json')
+
+
+SCRIPT_DIR = pathlib.Path('scripts')
+METADATA_NAME = 'meta.json'
+METADATA_EXAMPLE_PATH = SCRIPT_DIR / 'meta.example.json'
 
 with open(METADATA_EXAMPLE_PATH, 'r', encoding='utf-8') as f:
     DEFAULT_METADATA: str = f.read()
@@ -54,9 +57,9 @@ def pick_scripts() -> list[ScriptInfo]:
         所有脚本的信息
     """
 
-    def load_metadata(path: str) -> dict:
-        metadata_path = os.path.join(path, METADATA_NAME)
-        if not os.path.exists(metadata_path):
+    def load_metadata(script_path: pathlib.Path) -> dict:
+        metadata_path = script_path / METADATA_NAME
+        if not metadata_path.exists():
             logger.warning('脚本不存在meta.json文件')
             with open(metadata_path, 'w', encoding='utf-8') as f:
                 f.write(DEFAULT_METADATA)
@@ -71,14 +74,12 @@ def pick_scripts() -> list[ScriptInfo]:
             # 如果文件内容为 DEFAULT_METADATA 说明是程序创建的，所以不予加载
             elif file_content != DEFAULT_METADATA:
                 metadata = json.loads(file_content)
-            metadata['path'] = path
+            metadata['path'] = str(script_path)
             return metadata
 
     logger.debug('获取所有脚本')
-    scripts = os.listdir(SCRIPT_DIR)
-    scripts = [script for script in scripts if os.path.isdir(os.path.join(SCRIPT_DIR, script))]
+    scripts = [script for script in SCRIPT_DIR.iterdir() if script.is_dir()]
     logger.debug(f'获取到的脚本为：{scripts}')
-    scripts = [os.path.join(SCRIPT_DIR, script) for script in scripts]
     scripts = [load_metadata(script) for script in scripts]
     scripts = [ScriptInfo(**script) for script in scripts]
     for script in scripts:
