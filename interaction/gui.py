@@ -7,9 +7,12 @@ from script_loader.excel_loader import ExcelLoader
 from script_loader.main import pick_scripts, ScriptInfo, ScriptLoader, KeyScript
 from interaction.Ui_auto_key import Ui_auto_key
 from PySide6.QtWidgets import QApplication, QWidget
-from PySide6.QtCore import QThread, Signal, QObject
+from PySide6.QtCore import QThread, Signal, QObject, QTimer
 from markdown2 import markdown
 from executor.cosmic import Cosmic
+from interaction.shortcut_handler import bond_shortcut
+
+
 
 class Command:
     EXIT: str = 'exit'
@@ -83,6 +86,7 @@ class GuiInteractionLayer(QWidget):
         self.set_markdown('README.md')
         self.setup_signals()
 
+
     def set_markdown(self, markdown_file_path):
         # 读取Markdown文件
         with open(markdown_file_path, 'r', encoding='utf-8') as file:
@@ -117,6 +121,21 @@ class GuiInteractionLayer(QWidget):
         self.ui.pushButton_edit_script.clicked.connect(self.edit_script)
         # 连接 打开脚本文件夹 按钮 信号/槽
         self.ui.pushButton_open_script_folder.clicked.connect(self.open_script_folder)
+        # 绑定系统全局快捷键
+        bond_shortcut()
+        # 定时检查 cosmic 启动/暂停脚本 快捷键执行需求
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.check_cosmic_do_run_or_pause_scripts_status)
+        self.timer.start(200)
+
+    def check_cosmic_do_run_or_pause_scripts_status(self) -> None:
+        if Cosmic.do_run_script:
+            self.run_script()
+            Cosmic.do_run_script = False
+            
+        if Cosmic.do_pause_script:
+            self.pause_script()
+            Cosmic.do_pause_script = False
 
 
     def get_select_path(self):

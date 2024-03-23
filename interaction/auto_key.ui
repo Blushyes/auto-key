@@ -93,9 +93,6 @@
          <property name="text">
           <string>运行脚本(F6)</string>
          </property>
-         <property name="shortcut">
-          <string>F6</string>
-         </property>
         </widget>
        </item>
        <item>
@@ -107,7 +104,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>暂停脚本</string>
+          <string>暂停脚本(F9 / 鼠标移至屏幕左上角)</string>
          </property>
         </widget>
        </item>
