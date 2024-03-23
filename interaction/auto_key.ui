@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>316</width>
-    <height>540</height>
+    <width>329</width>
+    <height>633</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -60,6 +60,27 @@
        </item>
        <item>
         <widget class="QComboBox" name="comboBox_select_script"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_redo_times">
+           <property name="text">
+            <string>执行次数</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBox_redo_times">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>999999</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QPushButton" name="pushButton_run_script">

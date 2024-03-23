@@ -16,14 +16,14 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QHBoxLayout, QLabel,
-    QPlainTextEdit, QPushButton, QSizePolicy, QTabWidget,
-    QTextEdit, QVBoxLayout, QWidget)
+    QPlainTextEdit, QPushButton, QSizePolicy, QSpinBox,
+    QTabWidget, QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_auto_key(object):
     def setupUi(self, auto_key):
         if not auto_key.objectName():
             auto_key.setObjectName(u"auto_key")
-        auto_key.resize(316, 540)
+        auto_key.resize(329, 633)
         self.verticalLayout_2 = QVBoxLayout(auto_key)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.tabWidget = QTabWidget(auto_key)
@@ -62,6 +62,23 @@ class Ui_auto_key(object):
         self.comboBox_select_script.setObjectName(u"comboBox_select_script")
 
         self.verticalLayout.addWidget(self.comboBox_select_script)
+
+        self.horizontalLayout_2 = QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.label_redo_times = QLabel(self.tab_main)
+        self.label_redo_times.setObjectName(u"label_redo_times")
+
+        self.horizontalLayout_2.addWidget(self.label_redo_times)
+
+        self.spinBox_redo_times = QSpinBox(self.tab_main)
+        self.spinBox_redo_times.setObjectName(u"spinBox_redo_times")
+        self.spinBox_redo_times.setMinimum(1)
+        self.spinBox_redo_times.setMaximum(999999)
+
+        self.horizontalLayout_2.addWidget(self.spinBox_redo_times)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
 
         self.pushButton_run_script = QPushButton(self.tab_main)
         self.pushButton_run_script.setObjectName(u"pushButton_run_script")
@@ -133,6 +150,7 @@ class Ui_auto_key(object):
         self.label_welcome.setText(QCoreApplication.translate("auto_key", u"\u6b22\u8fce\u4f7f\u7528auto-key", None))
         self.label_script_list.setText(QCoreApplication.translate("auto_key", u"\u83b7\u53d6\u5230\u7684\u811a\u672c\u6709", None))
         self.label_ask_to_select_script.setText(QCoreApplication.translate("auto_key", u"\u8bf7\u95ee\u4f60\u8981\u6267\u884c\u54ea\u4e2a\u811a\u672c\u5462\uff1f", None))
+        self.label_redo_times.setText(QCoreApplication.translate("auto_key", u"\u6267\u884c\u6b21\u6570", None))
         self.pushButton_run_script.setText(QCoreApplication.translate("auto_key", u"\u8fd0\u884c\u811a\u672c(F6)", None))
 #if QT_CONFIG(shortcut)
         self.pushButton_run_script.setShortcut(QCoreApplication.translate("auto_key", u"F6", None))

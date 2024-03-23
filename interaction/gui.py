@@ -49,18 +49,21 @@ class RedirectOutput(QObject):
 class WorkThread(QObject):
     signal123 = Signal(str)
 
-    def __init__(self, redirect_output, script_info, key_scripts):
+    def __init__(self, redirect_output, script_info, key_scripts, redo_times):
         super().__init__()
         self.redirect_output = redirect_output
         self.script_info = script_info
         self.key_scripts = key_scripts
+        self.redo_times = redo_times
 
     def work(self):
         # 重定向 print 输出 到 图形界面
         self.redirect_output.start()
         # 执行脚本
-        executor: ScriptExecutor = SimpleExecutor(self.script_info)
-        executor.execute(self.key_scripts)
+        for i in range(self.redo_times):
+            executor: ScriptExecutor = SimpleExecutor(self.script_info)
+            executor.execute(self.key_scripts)
+            self.signal123.emit(f'脚本执行完成，第 {i + 1} 次')
         # 停止重定向 print 输出
         self.redirect_output.stop()
         # 请求线程退出事件循环
@@ -131,10 +134,13 @@ class GuiInteractionLayer(QWidget):
         redirect_output.output_signal.connect(self.ui.plainTextEdit_script_execute_status.appendPlainText)
         # 获取脚本信息
         script_info = self.scripts_list[self.select_script_index -1]  # 因为显示时从 1 开始计数，所以需要减 1
+        # 获取执行次数
+        redo_times = self.ui.spinBox_redo_times.value()
         # 设置线程
-        self.workThread = WorkThread(redirect_output, script_info, key_scripts)
+        self.workThread = WorkThread(redirect_output, script_info, key_scripts, redo_times)
         self.threadList = QThread()
         self.workThread.moveToThread(self.threadList)
+        self.workThread.signal123.connect(self.ui.plainTextEdit_script_execute_status.appendPlainText)
         self.threadList.started.connect(self.workThread.work)
         self.threadList.finished.connect(self.threadList_finished)
         # 启动线程
