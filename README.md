@@ -6,21 +6,25 @@
 
 #### 如何运行？
 
-1. 首先安装Python环境
+1. 首先安装 Python 环境
 2. 安装所需的库
    ```shell
    python.exe -m pip install --upgrade pip
    pip install -r environment.txt
    ```
-3. 打开`main.py`即可运行
 
-目前还只支持命令行版本，后续再更新GUI版本。
+3.1 打开`main.py`即可运行
+
+3.2 打开`main_gui.py`运行图形界面版
+
+![alt text](assets/gui.gif)
 
 #### 目录结构
 
 ```
 .
 ├── main.py
+├── main_gui.py
 ├── environment.txt
 ├── scripts # 脚本存放处
 │   ├── meta.example.json # meta.json的示例
@@ -29,7 +33,7 @@
 │   │   └── ...
 │   ├── your_script # 你的脚本
 │   │   ├── meta.json # 你的脚本的相关信息
-│   │   ├── index.xlsx # 你的Excel脚本 
+│   │   ├── index.xlsx # 你的Excel脚本
 │   │   └── ...
 └── script_loader # 脚本加载器，规定了一些关于脚本加载有关的接口
 │   ├── excel_loader.py # Excel脚本加载器

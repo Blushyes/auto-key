@@ -3,3 +3,5 @@ pyperclip==1.8.2
 pandas==2.1.2
 openpyxl== 3.1.2
 opencv-python
+PySide6
+markdown2
