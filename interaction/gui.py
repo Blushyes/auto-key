@@ -87,6 +87,8 @@ class GuiInteractionLayer(QWidget):
         self.ui.pushButton_run_script.clicked.connect(self.run_script)
         # 连接 退出 按钮 信号/槽
         self.ui.pushButton_exit.clicked.connect(self.close)
+        # 限制文本框字数，自动清空
+        self.ui.plainTextEdit_script_execute_status.textChanged.connect(self.auto_clear_execute_status)
 
 
     def run_script(self) -> None:
@@ -141,6 +143,10 @@ class GuiInteractionLayer(QWidget):
         # 启用 退出 按钮
         self.ui.pushButton_exit.setEnabled(True)
 
+    # 限制文本框字数，自动清空
+    def auto_clear_execute_status(self) -> None:
+        if len(self.ui.plainTextEdit_script_execute_status.toPlainText()) > 1000:
+            self.ui.plainTextEdit_script_execute_status.clear()
 
 def start():
     app = QApplication([])
