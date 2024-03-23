@@ -12,11 +12,12 @@
    python.exe -m pip install --upgrade pip
    pip install -r environment.txt
    ```
-   3.1 打开`main.py`即可运行
+
+3.1 打开`main.py`即可运行
 
 3.2 打开`main_gui.py`运行图形界面版
 
-![alt text](assets/gui.png)
+![alt text](assets/gui.gif)
 
 #### 目录结构
 

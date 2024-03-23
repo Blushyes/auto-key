@@ -15,15 +15,15 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QLabel, QPlainTextEdit,
-    QPushButton, QSizePolicy, QTabWidget, QTextEdit,
-    QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QComboBox, QHBoxLayout, QLabel,
+    QPlainTextEdit, QPushButton, QSizePolicy, QTabWidget,
+    QTextEdit, QVBoxLayout, QWidget)
 
 class Ui_auto_key(object):
     def setupUi(self, auto_key):
         if not auto_key.objectName():
             auto_key.setObjectName(u"auto_key")
-        auto_key.resize(316, 598)
+        auto_key.resize(316, 540)
         self.verticalLayout_2 = QVBoxLayout(auto_key)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.tabWidget = QTabWidget(auto_key)
@@ -44,6 +44,7 @@ class Ui_auto_key(object):
 
         self.plainTextEdit_script_list = QPlainTextEdit(self.tab_main)
         self.plainTextEdit_script_list.setObjectName(u"plainTextEdit_script_list")
+        self.plainTextEdit_script_list.setEnabled(True)
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(2)
@@ -71,6 +72,21 @@ class Ui_auto_key(object):
         self.pushButton_run_script.setSizePolicy(sizePolicy1)
 
         self.verticalLayout.addWidget(self.pushButton_run_script)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.pushButton_edit_script = QPushButton(self.tab_main)
+        self.pushButton_edit_script.setObjectName(u"pushButton_edit_script")
+
+        self.horizontalLayout.addWidget(self.pushButton_edit_script)
+
+        self.pushButton_open_script_folder = QPushButton(self.tab_main)
+        self.pushButton_open_script_folder.setObjectName(u"pushButton_open_script_folder")
+
+        self.horizontalLayout.addWidget(self.pushButton_open_script_folder)
+
+
+        self.verticalLayout.addLayout(self.horizontalLayout)
 
         self.pushButton_exit = QPushButton(self.tab_main)
         self.pushButton_exit.setObjectName(u"pushButton_exit")
@@ -121,6 +137,8 @@ class Ui_auto_key(object):
 #if QT_CONFIG(shortcut)
         self.pushButton_run_script.setShortcut(QCoreApplication.translate("auto_key", u"F6", None))
 #endif // QT_CONFIG(shortcut)
+        self.pushButton_edit_script.setText(QCoreApplication.translate("auto_key", u"\u7f16\u8f91\u811a\u672c", None))
+        self.pushButton_open_script_folder.setText(QCoreApplication.translate("auto_key", u"\u6253\u5f00\u811a\u672c\u6587\u4ef6\u5939", None))
         self.pushButton_exit.setText(QCoreApplication.translate("auto_key", u"\u9000\u51fa\u7a0b\u5e8f", None))
         self.label_script_execute_status.setText(QCoreApplication.translate("auto_key", u"\u811a\u672c\u8fd0\u884c\u72b6\u6001", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_main), QCoreApplication.translate("auto_key", u"\u4e3b\u754c\u9762", None))

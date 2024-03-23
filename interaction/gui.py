@@ -83,43 +83,54 @@ class GuiInteractionLayer(QWidget):
             # 从 1 开始计数
             self.ui.plainTextEdit_script_list.appendPlainText(f'{i + 1}. {script.name}')
             self.ui.comboBox_select_script.addItem(f'{i + 1}. {script.name}')
+
+
+
         # 连接 运行脚本 按钮 信号/槽
         self.ui.pushButton_run_script.clicked.connect(self.run_script)
         # 连接 退出 按钮 信号/槽
         self.ui.pushButton_exit.clicked.connect(self.close)
         # 限制文本框字数，自动清空
         self.ui.plainTextEdit_script_execute_status.textChanged.connect(self.auto_clear_execute_status)
+        # 连接 编辑脚本 按钮 信号/槽
+        self.ui.pushButton_edit_script.clicked.connect(self.edit_script)
+        # 连接 打开脚本文件夹 按钮 信号/槽
+        self.ui.pushButton_open_script_folder.clicked.connect(self.open_script_folder)
 
 
-    def run_script(self) -> None:
+    def get_select_path(self):
         try:
             # 获取用户输入的脚本序号
-            select_script = self.ui.comboBox_select_script.currentText()
-            select_script_index = int(select_script.split('.')[0])
+            self.select_script = self.ui.comboBox_select_script.currentText()
+            self.select_script_index = int(self.select_script.split('.')[0])
         except Exception as e:
             self.ui.plainTextEdit_script_execute_status.appendPlainText(f'脚本格式错误！！！{e}')
             return
 
         # TODO 可以根据 meta.json 配置脚本类型如：Excel等
-        if select_script_index >= len(self.scripts_list) or select_script_index < 0:
-            self.ui.plainTextEdit_script_execute_status.appendPlainText(f'不存在的脚本 “ {select_script} ” ！！！')
+        if self.select_script_index >= len(self.scripts_list) or self.select_script_index < 0:
+            self.ui.plainTextEdit_script_execute_status.appendPlainText(f'不存在的脚本 “ {self.select_script} ” ！！！')
             return
         
         # 获取用户输入的脚本序号
         # 因为显示时从 1 开始计数，所以需要减 1
-        select_path = self.scripts_list[select_script_index - 1].path
+        self.select_path = self.scripts_list[self.select_script_index - 1].path
 
+
+
+    def run_script(self) -> None:
+        self.get_select_path()
         # 加载脚本路径
         loader: ScriptLoader = ExcelLoader()
-        key_scripts: list[KeyScript] = loader.loads(select_path)
+        key_scripts: list[KeyScript] = loader.loads(self.select_path)
 
         # 多线程执行脚本，避免阻塞图形界面
-        self.ui.plainTextEdit_script_execute_status.appendPlainText(f'脚本 “ {select_script} ” 执行中...')
+        self.ui.plainTextEdit_script_execute_status.appendPlainText(f'脚本 “ {self.select_script} ” 执行中...')
         # 重定向 print 输出 到 图形界面
         redirect_output = RedirectOutput()
         redirect_output.output_signal.connect(self.ui.plainTextEdit_script_execute_status.appendPlainText)
         # 获取脚本信息
-        script_info = self.scripts_list[select_script_index -1]  # 因为显示时从 1 开始计数，所以需要减 1
+        script_info = self.scripts_list[self.select_script_index -1]  # 因为显示时从 1 开始计数，所以需要减 1
         # 设置线程
         self.workThread = WorkThread(redirect_output, script_info, key_scripts)
         self.threadList = QThread()
@@ -142,6 +153,21 @@ class GuiInteractionLayer(QWidget):
         self.ui.pushButton_run_script.setEnabled(True)
         # 启用 退出 按钮
         self.ui.pushButton_exit.setEnabled(True)
+
+
+    def edit_script(self) -> None:
+        self.get_select_path()
+        # 拼接 index.xlsx 路径
+        self.xlsx_path = os.path.join(self.select_path, 'index.xlsx')
+        # 打开脚本文件
+        os.system(f'start excel {self.xlsx_path}')
+
+
+    def open_script_folder(self) -> None:
+        self.get_select_path()
+        # 打开脚本文件夹
+        print(f'打开脚本文件夹：{self.select_path}')
+        os.system(f'start explorer "{self.select_path}"')
 
     # 限制文本框字数，自动清空
     def auto_clear_execute_status(self) -> None:
