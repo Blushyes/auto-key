@@ -49,7 +49,7 @@ class Ui_auto_key(object):
     def setupUi(self, auto_key):
         if not auto_key.objectName():
             auto_key.setObjectName(u"auto_key")
-        auto_key.resize(329, 633)
+        auto_key.resize(329, 688)
         self.verticalLayout_2 = QVBoxLayout(auto_key)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.tabWidget = QTabWidget(auto_key)
@@ -115,6 +115,13 @@ class Ui_auto_key(object):
 
         self.verticalLayout.addWidget(self.pushButton_run_script)
 
+        self.pushButton_pause_script = QPushButton(self.tab_main)
+        self.pushButton_pause_script.setObjectName(u"pushButton_pause_script")
+        sizePolicy1.setHeightForWidth(self.pushButton_pause_script.sizePolicy().hasHeightForWidth())
+        self.pushButton_pause_script.setSizePolicy(sizePolicy1)
+
+        self.verticalLayout.addWidget(self.pushButton_pause_script)
+
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.pushButton_edit_script = QPushButton(self.tab_main)
@@ -177,11 +184,8 @@ class Ui_auto_key(object):
                                                                            u"\u8bf7\u95ee\u4f60\u8981\u6267\u884c\u54ea\u4e2a\u811a\u672c\u5462\uff1f",
                                                                            None))
         self.label_redo_times.setText(QCoreApplication.translate("auto_key", u"\u6267\u884c\u6b21\u6570", None))
-        self.pushButton_run_script.setText(
-            QCoreApplication.translate("auto_key", u"\u8fd0\u884c\u811a\u672c(F6)", None))
-        # if QT_CONFIG(shortcut)
-        self.pushButton_run_script.setShortcut(QCoreApplication.translate("auto_key", u"F6", None))
-        # endif // QT_CONFIG(shortcut)
+        self.pushButton_run_script.setText(QCoreApplication.translate("auto_key", u"\u8fd0\u884c\u811a\u672c(F6)", None))
+        self.pushButton_pause_script.setText(QCoreApplication.translate("auto_key", u"\u6682\u505c\u811a\u672c(F9 / \u9f20\u6807\u79fb\u81f3\u5c4f\u5e55\u5de6\u4e0a\u89d2)", None))
         self.pushButton_edit_script.setText(QCoreApplication.translate("auto_key", u"\u7f16\u8f91\u811a\u672c", None))
         self.pushButton_open_script_folder.setText(
             QCoreApplication.translate("auto_key", u"\u6253\u5f00\u811a\u672c\u6587\u4ef6\u5939", None))

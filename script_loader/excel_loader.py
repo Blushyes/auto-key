@@ -1,9 +1,8 @@
-import os
-
 import pandas as pd
 from pandas import DataFrame, Series
 
 from script_loader.main import ScriptLoader, KeyScript
+from pathlib import Path
 
 SCRIPT_NAME = 'index'
 
@@ -22,14 +21,13 @@ def _get_col(df: DataFrame, col_index: int) -> list:
 class ExcelLoader(ScriptLoader):
 
     def loads(self, path: str) -> list[KeyScript]:
-        files = os.listdir(path)
-        scripts = [file for file in files if SCRIPT_NAME in file]
+        path = Path(path)
+        scripts = [file for file in path.iterdir() if SCRIPT_NAME in file.name]
         if len(scripts) == 0:
             raise Exception('没有脚本文件')
-        first_script: str = scripts[0]
-        first_script_type: str = first_script.split('.')[-1]
-        script_name: str = SCRIPT_NAME + '.' + first_script_type
-        script_path: str = os.path.join(path, script_name)
+        first_script = scripts[0]
+        first_script_type = first_script.suffix.lower()[1:]
+        script_path = path / f"{SCRIPT_NAME}.{first_script_type}"
 
         def read_excel():
             match first_script_type:

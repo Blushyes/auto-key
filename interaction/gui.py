@@ -1,8 +1,11 @@
 import os
 import sys
+from pathlib import Path
 
-from PySide6.QtCore import QThread, Signal, QObject
+from PySide6.QtCore import QThread, Signal, QObject, QTimer
 from PySide6.QtWidgets import QApplication, QWidget
+from executor.cosmic import Cosmic
+from interaction.shortcut_handler import bond_shortcut
 from markdown2 import markdown
 
 from executor.main import ScriptExecutor
@@ -66,6 +69,9 @@ class WorkThread(QObject):
         for i in range(self.redo_times):
             executor: ScriptExecutor = SimpleExecutor(self.script_info)
             executor.execute(self.key_scripts)
+            if Cosmic.pause_executor:
+                self.signal123.emit(f'脚本执行被手动暂停')
+                break
             self.signal123.emit(f'脚本执行完成，第 {i + 1} 次')
         # 停止重定向 print 输出
         self.redirect_output.stop()
@@ -91,6 +97,8 @@ class GuiInteractionLayer(QWidget):
         self.ui.textEdit_about.setHtml(html_text)
 
     def setup_signals(self) -> None:
+        # 初始无脚本运行，停用 暂停脚本 按钮
+        self.ui.pushButton_pause_script.setEnabled(False)
         # 获取脚本列表
         self.scripts_list: list[ScriptInfo] = pick_scripts()
         # 显示脚本列表
@@ -101,6 +109,8 @@ class GuiInteractionLayer(QWidget):
 
         # 连接 运行脚本 按钮 信号/槽
         self.ui.pushButton_run_script.clicked.connect(self.run_script)
+        # 连接 暂停脚本 按钮 信号/槽
+        self.ui.pushButton_pause_script.clicked.connect(self.pause_script)
         # 连接 退出 按钮 信号/槽
         self.ui.pushButton_exit.clicked.connect(self.close)
         # 限制文本框字数，自动清空
@@ -109,6 +119,21 @@ class GuiInteractionLayer(QWidget):
         self.ui.pushButton_edit_script.clicked.connect(self.edit_script)
         # 连接 打开脚本文件夹 按钮 信号/槽
         self.ui.pushButton_open_script_folder.clicked.connect(self.open_script_folder)
+        # 绑定系统全局快捷键
+        bond_shortcut()
+        # 定时检查 cosmic 启动/暂停脚本 快捷键执行需求
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.check_cosmic_do_run_or_pause_scripts_status)
+        self.timer.start(200)
+
+    def check_cosmic_do_run_or_pause_scripts_status(self) -> None:
+        if Cosmic.do_run_script:
+            self.run_script()
+            Cosmic.do_run_script = False
+
+        if Cosmic.do_pause_script:
+            self.pause_script()
+            Cosmic.do_pause_script = False
 
     def get_select_path(self):
         try:
@@ -126,9 +151,10 @@ class GuiInteractionLayer(QWidget):
 
         # 获取用户输入的脚本序号
         # 因为显示时从 1 开始计数，所以需要减 1
-        self.select_path = self.scripts_list[self.select_script_index - 1].path
+        self.select_path = Path(self.scripts_list[self.select_script_index - 1].path)
 
     def run_script(self) -> None:
+        Cosmic.pause_executor = False  # 恢复手动暂停标志
         self.get_select_path()
         # 加载脚本路径
         loader: ScriptLoader = ExcelLoader()
@@ -154,6 +180,8 @@ class GuiInteractionLayer(QWidget):
         self.threadList.start()
         # 停用 运行脚本 按钮
         self.ui.pushButton_run_script.setEnabled(False)
+        # 启用 暂停脚本 按钮
+        self.ui.pushButton_pause_script.setEnabled(True)
         # 停用 退出 按钮
         self.ui.pushButton_exit.setEnabled(False)
 
@@ -167,10 +195,16 @@ class GuiInteractionLayer(QWidget):
         # 启用 退出 按钮
         self.ui.pushButton_exit.setEnabled(True)
 
+    def pause_script(self) -> None:
+        Cosmic.pause_executor = True  # 设置手动暂停标志
+        self.ui.pushButton_run_script.setEnabled(True)
+        self.ui.pushButton_pause_script.setEnabled(False)
+        self.ui.pushButton_exit.setEnabled(True)
+
     def edit_script(self) -> None:
         self.get_select_path()
         # 拼接 index.xlsx 路径
-        self.xlsx_path = os.path.join(self.select_path, 'index.xlsx')
+        self.xlsx_path = self.select_path / 'index.xlsx'
         # 打开脚本文件
         os.system(f'start excel {self.xlsx_path}')
 
