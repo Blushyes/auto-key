@@ -31,7 +31,7 @@ def _get_pos(img: str) -> tuple[int, int]:
         print('waiting...')
 
         if Cosmic.pause_executor:  # 如果用户选择暂停执行，则退出循环
-            raise PauceException()
+            raise PauseException()
 
     return pyautogui.locateCenterOnScreen(image)
 
