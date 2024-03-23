@@ -128,6 +128,8 @@ class GuiInteractionLayer(QWidget):
         self.threadList.start()
         # 停用 运行脚本 按钮
         self.ui.pushButton_run_script.setEnabled(False)
+        # 停用 退出 按钮
+        self.ui.pushButton_exit.setEnabled(False)
         
     def threadList_finished(self) -> None:
         self.threadList.quit()  # 请求线程退出事件循环
@@ -136,6 +138,8 @@ class GuiInteractionLayer(QWidget):
         self.ui.plainTextEdit_script_execute_status.appendPlainText(f'脚本执行停止')
         # 启用 运行脚本 按钮
         self.ui.pushButton_run_script.setEnabled(True)
+        # 启用 退出 按钮
+        self.ui.pushButton_exit.setEnabled(True)
 
 
 def start():
