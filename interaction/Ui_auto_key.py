@@ -23,7 +23,7 @@ class Ui_auto_key(object):
     def setupUi(self, auto_key):
         if not auto_key.objectName():
             auto_key.setObjectName(u"auto_key")
-        auto_key.resize(329, 633)
+        auto_key.resize(329, 688)
         self.verticalLayout_2 = QVBoxLayout(auto_key)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.tabWidget = QTabWidget(auto_key)
@@ -90,6 +90,13 @@ class Ui_auto_key(object):
 
         self.verticalLayout.addWidget(self.pushButton_run_script)
 
+        self.pushButton_pause_script = QPushButton(self.tab_main)
+        self.pushButton_pause_script.setObjectName(u"pushButton_pause_script")
+        sizePolicy1.setHeightForWidth(self.pushButton_pause_script.sizePolicy().hasHeightForWidth())
+        self.pushButton_pause_script.setSizePolicy(sizePolicy1)
+
+        self.verticalLayout.addWidget(self.pushButton_pause_script)
+
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.pushButton_edit_script = QPushButton(self.tab_main)
@@ -155,6 +162,7 @@ class Ui_auto_key(object):
 #if QT_CONFIG(shortcut)
         self.pushButton_run_script.setShortcut(QCoreApplication.translate("auto_key", u"F6", None))
 #endif // QT_CONFIG(shortcut)
+        self.pushButton_pause_script.setText(QCoreApplication.translate("auto_key", u"\u6682\u505c\u811a\u672c", None))
         self.pushButton_edit_script.setText(QCoreApplication.translate("auto_key", u"\u7f16\u8f91\u811a\u672c", None))
         self.pushButton_open_script_folder.setText(QCoreApplication.translate("auto_key", u"\u6253\u5f00\u811a\u672c\u6587\u4ef6\u5939", None))
         self.pushButton_exit.setText(QCoreApplication.translate("auto_key", u"\u9000\u51fa\u7a0b\u5e8f", None))

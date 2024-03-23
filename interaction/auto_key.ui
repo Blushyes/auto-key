@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>329</width>
-    <height>633</height>
+    <height>688</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -95,6 +95,19 @@
          </property>
          <property name="shortcut">
           <string>F6</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_pause_script">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>暂停脚本</string>
          </property>
         </widget>
        </item>

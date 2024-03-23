@@ -9,6 +9,7 @@ from interaction.Ui_auto_key import Ui_auto_key
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtCore import QThread, Signal, QObject
 from markdown2 import markdown
+from executor.cosmic import Cosmic
 
 class Command:
     EXIT: str = 'exit'
@@ -64,6 +65,9 @@ class WorkThread(QObject):
         for i in range(self.redo_times):
             executor: ScriptExecutor = SimpleExecutor(self.script_info)
             executor.execute(self.key_scripts)
+            if Cosmic.pause_executor:
+                self.signal123.emit(f'脚本执行被手动暂停')
+                break
             self.signal123.emit(f'脚本执行完成，第 {i + 1} 次')
         # 停止重定向 print 输出
         self.redirect_output.stop()
@@ -89,6 +93,8 @@ class GuiInteractionLayer(QWidget):
         self.ui.textEdit_about.setHtml(html_text)
 
     def setup_signals(self) -> None:
+        # 初始无脚本运行，停用 暂停脚本 按钮
+        self.ui.pushButton_pause_script.setEnabled(False)
         # 获取脚本列表
         self.scripts_list: list[ScriptInfo] = pick_scripts()
         # 显示脚本列表
@@ -101,6 +107,8 @@ class GuiInteractionLayer(QWidget):
 
         # 连接 运行脚本 按钮 信号/槽
         self.ui.pushButton_run_script.clicked.connect(self.run_script)
+        # 连接 暂停脚本 按钮 信号/槽
+        self.ui.pushButton_pause_script.clicked.connect(self.pause_script)
         # 连接 退出 按钮 信号/槽
         self.ui.pushButton_exit.clicked.connect(self.close)
         # 限制文本框字数，自动清空
@@ -132,6 +140,7 @@ class GuiInteractionLayer(QWidget):
 
 
     def run_script(self) -> None:
+        Cosmic.pause_executor = False  # 恢复手动暂停标志
         self.get_select_path()
         # 加载脚本路径
         loader: ScriptLoader = ExcelLoader()
@@ -157,6 +166,8 @@ class GuiInteractionLayer(QWidget):
         self.threadList.start()
         # 停用 运行脚本 按钮
         self.ui.pushButton_run_script.setEnabled(False)
+        # 启用 暂停脚本 按钮
+        self.ui.pushButton_pause_script.setEnabled(True)
         # 停用 退出 按钮
         self.ui.pushButton_exit.setEnabled(False)
         
@@ -170,7 +181,12 @@ class GuiInteractionLayer(QWidget):
         # 启用 退出 按钮
         self.ui.pushButton_exit.setEnabled(True)
 
-
+    def pause_script(self) -> None:
+        Cosmic.pause_executor = True  # 设置手动暂停标志
+        self.ui.pushButton_run_script.setEnabled(True)
+        self.ui.pushButton_pause_script.setEnabled(False)
+        self.ui.pushButton_exit.setEnabled(True)
+    
     def edit_script(self) -> None:
         self.get_select_path()
         # 拼接 index.xlsx 路径
