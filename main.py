@@ -1,6 +1,8 @@
-from interaction.command_line import CommandLineInteractionLayer
+from context.config import initialize_config
+from interaction.factory import get_interaction_layer_from_config
 from interaction.main import InteractionLayer
 
 if __name__ == '__main__':
-    interaction: InteractionLayer = CommandLineInteractionLayer()
+    initialize_config()
+    interaction: InteractionLayer = get_interaction_layer_from_config()
     interaction.start()

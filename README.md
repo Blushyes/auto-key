@@ -7,42 +7,50 @@
 #### 如何运行？
 
 1. 首先安装 Python 环境
-2. 安装所需的库
+1. 安装所需的库
    ```shell
    python.exe -m pip install --upgrade pip
    pip install -r environment.txt
    ```
-
-3.1 打开`main.py`即可运行
-
-3.2 打开`main_gui.py`运行图形界面版
+1. 打开`main.py`即可运行
 
 ![alt text](assets/gui.gif)
+
+#### 切换交互
+
+通过更改`config.json`中的`interaction`字段来切换交互
+
+| 选项             | 说明      |
+|----------------|---------|
+| `command_line` | 命令行交互   |
+| `gui`          | GUI界面交互 |
+
+你也可以在`interaction`包下添加自定义交互，然后在`interaction.factory`中注册你的交互即可。
 
 #### 目录结构
 
 ```
 .
 ├── main.py
-├── main_gui.py
 ├── environment.txt
-├── scripts # 脚本存放处
-│   ├── meta.example.json # meta.json的示例
+├── scripts                # 脚本存放处
+│   ├── meta.example.json  # meta.json的示例
 │   ├── test_script
 │   │   ├── meta.json
 │   │   └── ...
-│   ├── your_script # 你的脚本
-│   │   ├── meta.json # 你的脚本的相关信息
-│   │   ├── index.xlsx # 你的Excel脚本
+│   ├── your_script        # 你的脚本
+│   │   ├── meta.json      # 你的脚本的相关信息
+│   │   ├── index.xlsx     # 你的Excel脚本
 │   │   └── ...
-└── script_loader # 脚本加载器，规定了一些关于脚本加载有关的接口
-│   ├── excel_loader.py # Excel脚本加载器
+└── script_loader          # 脚本加载器，规定了一些关于脚本加载有关的接口
+│   ├── excel_loader.py    # Excel脚本加载器
 │   └── ...
-└── executor # 规定了脚本执行器接口
-│   ├── simple.py # 最简单的脚本执行器
+└── executor               # 规定了脚本执行器接口
+│   ├── simple.py          # 最简单的脚本执行器
 │   └── ...
-└── interaction # 规定了交互接口
-│   ├── command_line.py # 命令行交互
+└── interaction            # 规定了交互接口
+│   ├── command_line.py    # 命令行交互
+│   ├── factory.py         # 交互层工厂，需要在这里注册自定义交互
 │   └── ...
 └── ...
 ```

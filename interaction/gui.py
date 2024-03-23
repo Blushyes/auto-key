@@ -1,13 +1,17 @@
 import os
 import sys
+
+from PySide6.QtCore import QThread, Signal, QObject
+from PySide6.QtWidgets import QApplication, QWidget
+from markdown2 import markdown
+
 from executor.main import ScriptExecutor
 from executor.simple import SimpleExecutor
+from interaction.Ui_auto_key import Ui_auto_key
+from interaction.main import InteractionLayer
 from script_loader.excel_loader import ExcelLoader
 from script_loader.main import pick_scripts, ScriptInfo, ScriptLoader, KeyScript
-from interaction.Ui_auto_key import Ui_auto_key
-from PySide6.QtWidgets import QApplication, QWidget
-from PySide6.QtCore import QThread, Signal, QObject
-from markdown2 import markdown
+
 
 class Command:
     EXIT: str = 'exit'
@@ -42,7 +46,6 @@ class RedirectOutput(QObject):
             sys.stdout = self.stdout
         if self.stderr:
             sys.stderr = self.stderr
-
 
 
 # 多线程执行脚本，避免阻塞图形界面
@@ -96,8 +99,6 @@ class GuiInteractionLayer(QWidget):
             self.ui.plainTextEdit_script_list.appendPlainText(f'{i + 1}. {script.name}')
             self.ui.comboBox_select_script.addItem(f'{i + 1}. {script.name}')
 
-
-
         # 连接 运行脚本 按钮 信号/槽
         self.ui.pushButton_run_script.clicked.connect(self.run_script)
         # 连接 退出 按钮 信号/槽
@@ -108,7 +109,6 @@ class GuiInteractionLayer(QWidget):
         self.ui.pushButton_edit_script.clicked.connect(self.edit_script)
         # 连接 打开脚本文件夹 按钮 信号/槽
         self.ui.pushButton_open_script_folder.clicked.connect(self.open_script_folder)
-
 
     def get_select_path(self):
         try:
@@ -123,12 +123,10 @@ class GuiInteractionLayer(QWidget):
         if self.select_script_index >= len(self.scripts_list) or self.select_script_index < 0:
             self.ui.plainTextEdit_script_execute_status.appendPlainText(f'不存在的脚本 “ {self.select_script} ” ！！！')
             return
-        
+
         # 获取用户输入的脚本序号
         # 因为显示时从 1 开始计数，所以需要减 1
         self.select_path = self.scripts_list[self.select_script_index - 1].path
-
-
 
     def run_script(self) -> None:
         self.get_select_path()
@@ -142,7 +140,7 @@ class GuiInteractionLayer(QWidget):
         redirect_output = RedirectOutput()
         redirect_output.output_signal.connect(self.ui.plainTextEdit_script_execute_status.appendPlainText)
         # 获取脚本信息
-        script_info = self.scripts_list[self.select_script_index -1]  # 因为显示时从 1 开始计数，所以需要减 1
+        script_info = self.scripts_list[self.select_script_index - 1]  # 因为显示时从 1 开始计数，所以需要减 1
         # 获取执行次数
         redo_times = self.ui.spinBox_redo_times.value()
         # 设置线程
@@ -158,7 +156,7 @@ class GuiInteractionLayer(QWidget):
         self.ui.pushButton_run_script.setEnabled(False)
         # 停用 退出 按钮
         self.ui.pushButton_exit.setEnabled(False)
-        
+
     def threadList_finished(self) -> None:
         self.threadList.quit()  # 请求线程退出事件循环
         self.threadList.wait()  # 等待线程完成
@@ -169,14 +167,12 @@ class GuiInteractionLayer(QWidget):
         # 启用 退出 按钮
         self.ui.pushButton_exit.setEnabled(True)
 
-
     def edit_script(self) -> None:
         self.get_select_path()
         # 拼接 index.xlsx 路径
         self.xlsx_path = os.path.join(self.select_path, 'index.xlsx')
         # 打开脚本文件
         os.system(f'start excel {self.xlsx_path}')
-
 
     def open_script_folder(self) -> None:
         self.get_select_path()
@@ -189,8 +185,10 @@ class GuiInteractionLayer(QWidget):
         if len(self.ui.plainTextEdit_script_execute_status.toPlainText()) > 1000:
             self.ui.plainTextEdit_script_execute_status.clear()
 
-def start():
-    app = QApplication([])
-    window = GuiInteractionLayer()
-    window.show()
-    app.exec()
+
+class QTGUIInteractionLayer(InteractionLayer):
+    def start(self) -> None:
+        app = QApplication([])
+        window = GuiInteractionLayer()
+        window.show()
+        app.exec()
