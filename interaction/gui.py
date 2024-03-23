@@ -7,7 +7,7 @@ from script_loader.main import pick_scripts, ScriptInfo, ScriptLoader, KeyScript
 from interaction.Ui_auto_key import Ui_auto_key
 from PySide6.QtWidgets import QApplication, QWidget
 from PySide6.QtCore import QThread, Signal, QObject
-
+from markdown2 import markdown
 
 class Command:
     EXIT: str = 'exit'
@@ -75,8 +75,17 @@ class GuiInteractionLayer(QWidget):
         super().__init__()
         self.ui = Ui_auto_key()
         self.ui.setupUi(self)
+        self.set_markdown('README.md')
         self.setup_signals()
 
+    def set_markdown(self, markdown_file_path):
+        # 读取Markdown文件
+        with open(markdown_file_path, 'r', encoding='utf-8') as file:
+            markdown_text = file.read()
+        # 将Markdown文本转换为HTML
+        html_text = markdown(markdown_text)
+        # 将HTML文本设置到QTextEdit中
+        self.ui.textEdit_about.setHtml(html_text)
 
     def setup_signals(self) -> None:
         # 获取脚本列表
