@@ -86,7 +86,7 @@ class GuiInteractionLayer(QWidget):
         # 连接 运行脚本 按钮 信号/槽
         self.ui.pushButton_run_script.clicked.connect(self.run_script)
         # 连接 退出 按钮 信号/槽
-        # self.ui.pushButton_exit.clicked.connect(self.exit)
+        self.ui.pushButton_exit.clicked.connect(self.close)
 
 
     def run_script(self) -> None:
