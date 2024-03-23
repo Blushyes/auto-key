@@ -17,13 +17,13 @@ class CommandType:
     SCROLL = 6
 
 
-def _get_pos(img: str):
+def _get_pos(img: str) -> tuple[int, int]:
     image = Image.open(img)
-    while True:
-        try:
-            return pyautogui.locateCenterOnScreen(image, confidence=.9)
-        except pyautogui.ImageNotFoundException:
-            print(f"未在屏幕区域匹配到与 {img} 相同的图片")
+
+    # 有时候图片还没加载完，或者画面是动态的，需要循环查找
+    while pyautogui.locateCenterOnScreen(image) is None:
+        print('waiting...')
+    return pyautogui.locateCenterOnScreen(image)
 
 
 class SimpleExecutor(ScriptExecutor):
