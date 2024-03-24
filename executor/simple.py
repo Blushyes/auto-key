@@ -18,7 +18,7 @@ class CommandType:
     HOTKEY = 7
 
 
-def _get_pos(img_path: Path):
+def _get_pos(img_path: Path) -> tuple[int, int] | None:
     image = Image.open(img_path)
     while True:
         try:
@@ -78,12 +78,8 @@ class SimpleExecutor(ScriptExecutor):
                     case CommandType.HOTKEY:
                         pyautogui.hotkey(*format_hotkey_string(script.content))
 
-
             except pyautogui.FailSafeException:
                 print("鼠标移动到屏幕左上边缘，触发了安全保护，脚本执行已停止。")
-                return
-            except PauseException:
-                print("脚本已暂停。")
                 return
 
             if script.jump_to == -1:
