@@ -10,6 +10,7 @@ class CommandType(Enum):
     WAIT = 5
     SCROLL = 6
     HOTKEY = 7
+    DRAG = 8
 
 
 class Cosmic:
