@@ -8,6 +8,7 @@ from PIL import Image
 
 from executor.external import CommandType, Cosmic
 from executor.interfaces import CommandExecutorFactory, CommandExecutor
+from executor.simple.format_hotkey_string import format_hotkey_string
 from script_loader import ScriptInfo
 
 
@@ -77,7 +78,7 @@ class SimpleScrollExecutor(CommandExecutor):
 
 class SimpleHotkeyExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
-        pyautogui.hotkey(*arg.split("+"))
+        pyautogui.hotkey(*format_hotkey_string(arg))
 
 
 class SimpleMoveExecutor(CommandExecutor):
