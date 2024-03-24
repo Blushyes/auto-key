@@ -4,20 +4,20 @@ from pathlib import Path
 
 from PySide6.QtCore import QThread, Signal, QObject, QTimer
 from PySide6.QtWidgets import QApplication, QWidget
-from executor.cosmic import Cosmic
-from interaction.shortcut_handler import bond_shortcut
 from markdown2 import markdown
 
-from executor.main import ScriptExecutor
-from executor.simple import SimpleExecutor
-from interaction.Ui_auto_key import Ui_auto_key
-from interaction.main import InteractionLayer
-from script_loader.excel_loader import ExcelLoader
-from script_loader.main import pick_scripts, ScriptInfo, ScriptLoader, KeyScript
+from executor import execute, CommandExecutorWrapper
+from executor.external import Cosmic
+from interaction.gui.Ui_auto_key import Ui_auto_key
+from interaction import InteractionLayer
+from interaction.gui.shortcut_handler import bond_shortcut
+from script_loader.excel.__init__ import ExcelLoader
+from script_loader.interfaces import ScriptLoader
+from script_loader import pick_scripts, ScriptInfo
 
 
 class Command:
-    EXIT: str = 'exit'
+    EXIT: str = "exit"
 
 
 # # 重定向 print 输出 到 图形界面
@@ -55,7 +55,13 @@ class RedirectOutput(QObject):
 class WorkThread(QObject):
     signal123 = Signal(str)
 
-    def __init__(self, redirect_output, script_info, key_scripts, redo_times):
+    def __init__(
+        self,
+        redirect_output,
+        script_info: ScriptInfo,
+        key_scripts: list[CommandExecutorWrapper],
+        redo_times,
+    ):
         super().__init__()
         self.redirect_output = redirect_output
         self.script_info = script_info
@@ -65,16 +71,18 @@ class WorkThread(QObject):
     def work(self):
         # 重定向 print 输出 到 图形界面
         self.redirect_output.start()
+
         # 执行脚本
         for i in range(self.redo_times):
-            executor: ScriptExecutor = SimpleExecutor(self.script_info)
-            executor.execute(self.key_scripts)
+            execute(self.script_info, self.key_scripts)
             if Cosmic.pause_executor:
-                self.signal123.emit(f'脚本执行被手动暂停')
+                self.signal123.emit(f"脚本执行被手动暂停")
                 break
-            self.signal123.emit(f'脚本执行完成，第 {i + 1} 次')
+            self.signal123.emit(f"脚本执行完成，第 {i + 1} 次")
+
         # 停止重定向 print 输出
         self.redirect_output.stop()
+
         # 请求线程退出事件循环
         self.thread().quit()
 
@@ -84,12 +92,12 @@ class GuiInteractionLayer(QWidget):
         super().__init__()
         self.ui = Ui_auto_key()
         self.ui.setupUi(self)
-        self.set_markdown('README.md')
+        self.set_markdown("README.md")
         self.setup_signals()
 
     def set_markdown(self, markdown_file_path):
         # 读取Markdown文件
-        with open(markdown_file_path, 'r', encoding='utf-8') as file:
+        with open(markdown_file_path, "r", encoding="utf-8") as file:
             markdown_text = file.read()
         # 将Markdown文本转换为HTML
         html_text = markdown(markdown_text)
@@ -104,8 +112,8 @@ class GuiInteractionLayer(QWidget):
         # 显示脚本列表
         for i, script in enumerate(self.scripts_list):
             # 从 1 开始计数
-            self.ui.plainTextEdit_script_list.appendPlainText(f'{i + 1}. {script.name}')
-            self.ui.comboBox_select_script.addItem(f'{i + 1}. {script.name}')
+            self.ui.plainTextEdit_script_list.appendPlainText(f"{i + 1}. {script.name}")
+            self.ui.comboBox_select_script.addItem(f"{i + 1}. {script.name}")
 
         # 连接 运行脚本 按钮 信号/槽
         self.ui.pushButton_run_script.clicked.connect(self.run_script)
@@ -114,7 +122,9 @@ class GuiInteractionLayer(QWidget):
         # 连接 退出 按钮 信号/槽
         self.ui.pushButton_exit.clicked.connect(self.close)
         # 限制文本框字数，自动清空
-        self.ui.plainTextEdit_script_execute_status.textChanged.connect(self.auto_clear_execute_status)
+        self.ui.plainTextEdit_script_execute_status.textChanged.connect(
+            self.auto_clear_execute_status
+        )
         # 连接 编辑脚本 按钮 信号/槽
         self.ui.pushButton_edit_script.clicked.connect(self.edit_script)
         # 连接 打开脚本文件夹 按钮 信号/槽
@@ -139,14 +149,21 @@ class GuiInteractionLayer(QWidget):
         try:
             # 获取用户输入的脚本序号
             self.select_script = self.ui.comboBox_select_script.currentText()
-            self.select_script_index = int(self.select_script.split('.')[0])
+            self.select_script_index = int(self.select_script.split(".")[0])
         except Exception as e:
-            self.ui.plainTextEdit_script_execute_status.appendPlainText(f'脚本格式错误！！！{e}')
+            self.ui.plainTextEdit_script_execute_status.appendPlainText(
+                f"脚本格式错误！！！{e}"
+            )
             return
 
         # TODO 可以根据 meta.json 配置脚本类型如：Excel等
-        if self.select_script_index >= len(self.scripts_list) or self.select_script_index < 0:
-            self.ui.plainTextEdit_script_execute_status.appendPlainText(f'不存在的脚本 “ {self.select_script} ” ！！！')
+        if (
+            self.select_script_index >= len(self.scripts_list)
+            or self.select_script_index < 0
+        ):
+            self.ui.plainTextEdit_script_execute_status.appendPlainText(
+                f"不存在的脚本 “ {self.select_script} ” ！！！"
+            )
             return
 
         # 获取用户输入的脚本序号
@@ -158,22 +175,32 @@ class GuiInteractionLayer(QWidget):
         self.get_select_path()
         # 加载脚本路径
         loader: ScriptLoader = ExcelLoader()
-        key_scripts: list[KeyScript] = loader.loads(self.select_path)
+        key_scripts: list[CommandExecutorWrapper] = loader.loads(self.select_path)
 
         # 多线程执行脚本，避免阻塞图形界面
-        self.ui.plainTextEdit_script_execute_status.appendPlainText(f'脚本 “ {self.select_script} ” 执行中...')
+        self.ui.plainTextEdit_script_execute_status.appendPlainText(
+            f"脚本 “ {self.select_script} ” 执行中..."
+        )
         # 重定向 print 输出 到 图形界面
         redirect_output = RedirectOutput()
-        redirect_output.output_signal.connect(self.ui.plainTextEdit_script_execute_status.appendPlainText)
+        redirect_output.output_signal.connect(
+            self.ui.plainTextEdit_script_execute_status.appendPlainText
+        )
         # 获取脚本信息
-        script_info = self.scripts_list[self.select_script_index - 1]  # 因为显示时从 1 开始计数，所以需要减 1
+        script_info = self.scripts_list[
+            self.select_script_index - 1
+        ]  # 因为显示时从 1 开始计数，所以需要减 1
         # 获取执行次数
         redo_times = self.ui.spinBox_redo_times.value()
         # 设置线程
-        self.workThread = WorkThread(redirect_output, script_info, key_scripts, redo_times)
+        self.workThread = WorkThread(
+            redirect_output, script_info, key_scripts, redo_times
+        )
         self.threadList = QThread()
         self.workThread.moveToThread(self.threadList)
-        self.workThread.signal123.connect(self.ui.plainTextEdit_script_execute_status.appendPlainText)
+        self.workThread.signal123.connect(
+            self.ui.plainTextEdit_script_execute_status.appendPlainText
+        )
         self.threadList.started.connect(self.workThread.work)
         self.threadList.finished.connect(self.threadList_finished)
         # 启动线程
@@ -189,7 +216,7 @@ class GuiInteractionLayer(QWidget):
         self.threadList.quit()  # 请求线程退出事件循环
         self.threadList.wait()  # 等待线程完成
         self.threadList.deleteLater()  # 删除线程对象
-        self.ui.plainTextEdit_script_execute_status.appendPlainText(f'脚本执行停止')
+        self.ui.plainTextEdit_script_execute_status.appendPlainText(f"脚本执行停止")
         # 启用 运行脚本 按钮
         self.ui.pushButton_run_script.setEnabled(True)
         # 启用 退出 按钮
@@ -204,14 +231,14 @@ class GuiInteractionLayer(QWidget):
     def edit_script(self) -> None:
         self.get_select_path()
         # 拼接 index.xlsx 路径
-        self.xlsx_path = self.select_path / 'index.xlsx'
+        self.xlsx_path = self.select_path / "index.xlsx"
         # 打开脚本文件
-        os.system(f'start excel {self.xlsx_path}')
+        os.system(f"start excel {self.xlsx_path}")
 
     def open_script_folder(self) -> None:
         self.get_select_path()
         # 打开脚本文件夹
-        print(f'打开脚本文件夹：{self.select_path}')
+        print(f"打开脚本文件夹：{self.select_path}")
         os.system(f'start explorer "{self.select_path}"')
 
     # 限制文本框字数，自动清空

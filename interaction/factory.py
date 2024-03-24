@@ -1,7 +1,7 @@
 from context.config import get_config, Config
 from interaction.command_line import CommandLineInteractionLayer
 from interaction.gui import QTGUIInteractionLayer
-from interaction.main import InteractionLayer
+from interaction import InteractionLayer
 
 
 class InteractionLayerType:
