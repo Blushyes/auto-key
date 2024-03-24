@@ -52,6 +52,7 @@ class SimpleCommandExecutorFactory(CommandExecutorFactory):
             CommandType.SINGLE_CLICK: SimpleSingleClickExecutor,
             CommandType.DOUBLE_CLICK: SimpleDoubleClickExecutor,
             CommandType.RIGHT_CLICK: SimpleRightClickExecutor,
+            CommandType.DRAG: SimpleDragExecutor,
         }
         executor_class = executor_classes.get(command_type)
         if executor_class:
@@ -89,7 +90,9 @@ class SimpleMoveExecutor(CommandExecutor):
 
 class SimpleSingleClickExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
+
         parsed_arg = ClickArgWithOffset(**json.loads(arg))
+
         img_path = Path(context.path) / parsed_arg.img_name
         pos = _get_pos_with_offset(img_path, parsed_arg.offset_x, parsed_arg.offset_y)
 
@@ -124,3 +127,10 @@ class SimpleRightClickExecutor(CommandExecutor):
 
         x, y = pos
         pyautogui.click(x, y, interval=0.2, duration=0.2, button="right")
+
+
+class SimpleDragExecutor(CommandExecutor):
+    def execute(self, context: ScriptInfo, arg: str) -> None:
+        parsed_arg = ClickArgWithOffset(**json.loads(arg))
+        pyautogui.dragRel(parsed_arg.offset_x, parsed_arg.offset_y, duration=float(parsed_arg.img_name))  # 使用 内容列来存持续时间，
+                                                                                                        # TODO img_name 这个命名不太好吧，要不要改改？
