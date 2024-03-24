@@ -21,6 +21,8 @@ class KeyScript:
     command: int
     content: str
     jump_to: int = field(default=-1)
+    offset_x: int = field(default=0)
+    offset_y: int = field(default=0)
 
 
 @dataclass

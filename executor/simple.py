@@ -43,6 +43,7 @@ class SimpleExecutor(ScriptExecutor):
                     case CommandType.SINGLE_CLICK:
                         try:
                             x, y = _get_pos(Path(self._script_info.path) / script.content)
+                            x, y = x + script.offset_x, y + script.offset_y  # 偏移量
                             pyautogui.click(x, y, interval=.2, duration=.2)
                         except TypeError:  # 用户选择暂停执行
                             return
@@ -50,6 +51,7 @@ class SimpleExecutor(ScriptExecutor):
                     case CommandType.DOUBLE_CLICK:
                         try:
                             x, y = _get_pos(Path(self._script_info.path) / script.content)
+                            x, y = x + script.offset_x, y + script.offset_y  # 偏移量
                             pyautogui.click(x, y, interval=.2, duration=.2, clicks=2)
                         except TypeError:  # 用户选择暂停执行
                             return
@@ -57,6 +59,7 @@ class SimpleExecutor(ScriptExecutor):
                     case CommandType.RIGHT_CLICK:
                         try:
                             x, y = _get_pos(Path(self._script_info.path) / script.content)
+                            x, y = x + script.offset_x, y + script.offset_y  # 偏移量
                             pyautogui.click(x, y, interval=.2, duration=.2, button='right')
                         except TypeError:  # 用户选择暂停执行
                             return

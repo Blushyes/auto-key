@@ -42,5 +42,7 @@ class ExcelLoader(ScriptLoader):
         commands: list = _get_col(df, 0)
         contents: list = _get_col(df, 1)
         jump_list: list = _get_col(df, 2)
+        offset_x_list: list = _get_col(df, 3)
+        offset_y_list: list = _get_col(df, 4)
 
-        return [KeyScript(command, content, jump) for command, content, jump in zip(commands, contents, jump_list)]
+        return [KeyScript(command, content, jump, offset_x_list, offset_y_list) for command, content, jump, offset_x_list, offset_y_list in zip(commands, contents, jump_list, offset_x_list, offset_y_list)]
