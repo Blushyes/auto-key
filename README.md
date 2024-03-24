@@ -9,7 +9,6 @@
 1. 首先安装 Python 环境
 1. 安装所需的库
    ```shell
-   python.exe -m pip install --upgrade pip
    pip install -r requirements.txt
    ```
 1. 打开`main.py`即可运行
@@ -22,7 +21,7 @@
 
 ![alt text](assets/使用偏移量点击（两个记事本的关闭按钮图形一样）.gif)
 
-- 两个记事本的关闭按钮图形一样，都是“ X ”，单纯识别“ X ”可能会误操作，这是就需要识别标题再根据标题偏移“ offset_x ” “ offiset_y ”位置，再进行点击。
+- 两个记事本的关闭按钮图形一样，都是“ X ”，单纯识别“ X ”可能会误操作，这是就需要识别标题再根据标题偏移“ offset_x ” “ offset_y ”位置，再进行点击。
 
 模拟快捷键：
 
@@ -47,37 +46,37 @@
 
 - `F9` 暂停脚本 （鼠标移至屏幕左上角也可暂停）
 
-  可以在 `.\executor\cosmic.py`修改快捷键按键设置
+  可以在 `./executor/external.py`中的`Comic`类修改快捷键按键设置
 
 ## 目录结构
 
-```python
+```
 📁 auto-key/
 ├─📄LICENSE
-├─📜main.py                     # 运行命令行版 auto-key
+├─📜main.py                     # auto-key入口
 ├─✏️README.md
 ├─✏️requirements.txt            # 依赖库
 ├─📁 scripts/                   # 脚本存放处
 ├─📁 context/
 │ ├─📜logging.py
 ├─📁 executor/                  # 规定了脚本执行器接口
-│ ├─📜cosmic.py                 # 需要跨模块访问的变量值，可以在这里 修改快捷键按键设置
-│ ├─📜main.py
-│ ├─📜simple.py                 # 最简单的脚本执行器
+│ └─📁 simple.py/               # 最简单的脚本执行器
+│ ├─📜external.py               # 存放外部需要访问的实体类
 ├─📁 interaction/               # 规定了交互接口
-│ ├─📄auto_key.ui
-│ ├─📜command_line.py           # 命令行交互
-│ ├─📜gui.py                    # 图形界面交互
-│ ├─📜main.py
-│ ├─📜shortcut_handler.py
-│ ├─📜Ui_auto_key.py
-│ ├─✏️meta.example.json         # meta.json的示例
+│ ├─📁 command_line.py          # 命令行交互
+│ └─📁 gui.py                   # 图形界面交互
+│ ├─ ├─📄auto_key.ui
+│ ├─ ├─📜main.py
+│ ├─ ├─📜shortcut_handler.py
+│ ├─ ├─📜Ui_auto_key.py
+├─📁 scripts/                   # 脚本存放文件夹
 │ ├─📁 test_calc/
+│ ├─ ├─✏️meta.json
 │ ├─📁 test_csv_file_script/
 │ └─📁 test_script/
+│ ├─✏️meta.example.json         # meta.json的示例
 └─📁 script_loader/             # 脚本加载器，规定了一些关于脚本加载有关的接口
-  ├─📜excel_loader.py
-  ├─📜main.py
+  └─📁 excel.py                 # Excel脚本加载器
 ```
 
 ## 编写脚本
