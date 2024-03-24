@@ -17,23 +17,15 @@ class CommandType:
     SCROLL = 6
 
 
-class PauseException(Exception):
-    def __init__(self, message: str = '暂停'):
-        self.message = message
-        super().__init__(self.message)
-
-
-def _get_pos(img: str) -> tuple[int, int]:
-    image = Image.open(img)
-
-    # 有时候图片还没加载完，或者画面是动态的，需要循环查找
-    while pyautogui.locateCenterOnScreen(image) is None:
-        print('waiting...')
-
-        if Cosmic.pause_executor:  # 如果用户选择暂停执行，则退出循环
-            raise PauseException()
-
-    return pyautogui.locateCenterOnScreen(image)
+def _get_pos(img_path: Path) -> tuple[int, int] | None:
+    image = Image.open(img_path)
+    while True:
+        try:
+            return pyautogui.locateCenterOnScreen(image, confidence=.9)
+        except pyautogui.ImageNotFoundException:
+            print(f"未在屏幕区域匹配到与 {img_path} 相同的图片")
+            if Cosmic.pause_executor:  # 如果用户选择暂停执行，则退出循环
+                return None
 
 
 class SimpleExecutor(ScriptExecutor):
@@ -51,6 +43,7 @@ class SimpleExecutor(ScriptExecutor):
                     case CommandType.SINGLE_CLICK:
                         try:
                             x, y = _get_pos(Path(self._script_info.path) / script.content)
+                            x, y = x + script.offset_x, y + script.offset_y  # 偏移量
                             pyautogui.click(x, y, interval=.2, duration=.2)
                         except TypeError:  # 用户选择暂停执行
                             return
@@ -58,6 +51,7 @@ class SimpleExecutor(ScriptExecutor):
                     case CommandType.DOUBLE_CLICK:
                         try:
                             x, y = _get_pos(Path(self._script_info.path) / script.content)
+                            x, y = x + script.offset_x, y + script.offset_y  # 偏移量
                             pyautogui.click(x, y, interval=.2, duration=.2, clicks=2)
                         except TypeError:  # 用户选择暂停执行
                             return
@@ -65,6 +59,7 @@ class SimpleExecutor(ScriptExecutor):
                     case CommandType.RIGHT_CLICK:
                         try:
                             x, y = _get_pos(Path(self._script_info.path) / script.content)
+                            x, y = x + script.offset_x, y + script.offset_y  # 偏移量
                             pyautogui.click(x, y, interval=.2, duration=.2, button='right')
                         except TypeError:  # 用户选择暂停执行
                             return
@@ -79,12 +74,8 @@ class SimpleExecutor(ScriptExecutor):
                     case CommandType.SCROLL:
                         pyautogui.scroll(int(script.content))
 
-
             except pyautogui.FailSafeException:
                 print("鼠标移动到屏幕左上边缘，触发了安全保护，脚本执行已停止。")
-                return
-            except PauseException:
-                print("脚本已暂停。")
                 return
 
             if script.jump_to == -1:
