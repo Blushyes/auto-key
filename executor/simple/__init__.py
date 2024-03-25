@@ -13,6 +13,8 @@ from executor.interfaces import CommandExecutorFactory, CommandExecutor
 from executor.simple.format_hotkey_string import format_hotkey_string
 from script_loader import ScriptInfo
 
+import subprocess
+
 
 # NOTE 用于分隔次要图片，比如arg的图片为hello.png，那么hello-1.png和hello-2.png以及hello_1.png都会被尝试读取坐标
 # NOTE 只要有一张图片能读取到坐标即可返回
@@ -107,6 +109,7 @@ class SimpleCommandExecutorFactory(CommandExecutorFactory):
             CommandType.DOUBLE_CLICK: SimpleDoubleClickExecutor,
             CommandType.RIGHT_CLICK: SimpleRightClickExecutor,
             CommandType.DRAG: SimpleDragExecutor,
+            CommandType.CMD: SimpleCommandExecutor,
         }
         executor_class = executor_classes.get(command_type)
         if executor_class:
@@ -199,8 +202,14 @@ class SimpleRightClickExecutor(CommandExecutor):
 class SimpleDragExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         parsed_arg = ClickArgWithOffset(**json.loads(arg))
-        pyautogui.dragRel(
-            parsed_arg.offset_x,
-            parsed_arg.offset_y,
-            duration=float(parsed_arg.filename),
-        )  # 使用 内容列来存持续时间，
+        pyautogui.dragRel(parsed_arg.offset_x, parsed_arg.offset_y, duration=float(parsed_arg.filename))  # 使用 内容列来存持续时间，
+                                                                                                        # TODO img_name 这个命名不太好吧，要不要改改？
+
+class SimpleCommandExecutor(CommandExecutor):
+    def execute(self, context: ScriptInfo, arg: str) -> None:
+        bat_file_path = Path(context.path) / arg
+        print(f"执行批处理文件: {bat_file_path}")  # print 会被重定向到图形界面 脚本运行状态 文本框
+        process = subprocess.Popen(['cmd', '/c', str(bat_file_path)], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        process.wait()
+        stdout, stderr = process.communicate()
+        print(stdout, stderr)

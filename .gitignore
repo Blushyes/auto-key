@@ -139,3 +139,7 @@ dmypy.json
 cython_debug/
 
 .idea
+
+# Personal useage
+daily_check
+setup_code_env
