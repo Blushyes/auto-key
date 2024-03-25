@@ -13,30 +13,37 @@ from script_loader.interfaces import ScriptLoader
 # 脚本文件名
 SCRIPT_NAME = "index"
 
-# 定义Excel文件类型
+
 class ExcelFileType:
     XLSX = "xlsx"
     CSV = "csv"
 
-# 获取DataFrame中指定列的值，如果列不存在则返回None
+
 def _get_col(df: DataFrame, col_index: int) -> list | None:
+    """
+    Returns:
+        若列不存在则返回None，否则返回列的值列表
+    """
     _, col_len = df.shape
     if col_len - 1 < col_index:
         return None
 
     col: Series = df.iloc[:, col_index]
-    col = col.fillna(-1)
+    col = col.fillna(0)
     return col.to_list()
 
-# 实现ScriptLoader接口的ExcelLoader类
+
 class ExcelLoader(ScriptLoader):
+    """
+    Excel加载器，用于加载xlsx和csv类型的脚本
+    """
+
     # TODO 后续再优化
-    # 从Excel文件中加载脚本
     def loads(self, path: Path | str) -> list[CommandExecutorWrapper]:
         if isinstance(path, str):
             path = Path(path)
 
-        # 查找所有包含SCRIPT_NAME的文件
+        # 搜索脚本目录下面的脚本文件
         scripts = [file for file in path.iterdir() if SCRIPT_NAME in file.name]
 
         if len(scripts) == 0:
@@ -46,7 +53,6 @@ class ExcelLoader(ScriptLoader):
         first_script_type = first_script.suffix.lower()[1:]
         script_path = path / f"{SCRIPT_NAME}.{first_script_type}"
 
-        # 读取Excel文件
         def read_excel():
             match first_script_type:
                 case ExcelFileType.XLSX:
@@ -72,7 +78,6 @@ class ExcelLoader(ScriptLoader):
 
         executor_factory: CommandExecutorFactory = SimpleCommandExecutorFactory()
 
-        # 根据命令类型和参数组装CommandExecutorWrapper
         def assemble_wrapper(
             command_code: int, arg: str, jump_to: int, offset_x: int, offset_y: int
         ) -> CommandExecutorWrapper:
@@ -86,7 +91,7 @@ class ExcelLoader(ScriptLoader):
                 return CommandExecutorWrapper(
                     executor_factory.create(CommandType(command_code)),
                     json.dumps(
-                        {"img_name": arg, "offset_x": offset_x, "offset_y": offset_y}
+                        {"filename": arg, "offset_x": offset_x, "offset_y": offset_y}
                     ),
                     jump_to,
                 )
@@ -95,7 +100,6 @@ class ExcelLoader(ScriptLoader):
                 executor_factory.create(CommandType(command_code)), arg, jump_to
             )
 
-        # 组装所有命令
         return [
             assemble_wrapper(command, content, jump, offset_x, offset_y)
             for command, content, jump, offset_x, offset_y in zip(
