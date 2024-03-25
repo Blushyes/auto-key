@@ -125,8 +125,12 @@ class SimpleInputExecutor(CommandExecutor):
 
 
 class SimpleWaitExecutor(CommandExecutor):
+    """
+    等待指定图片出现为止
+    """
+
     def execute(self, context: ScriptInfo, arg: str) -> None:
-        pass
+        _get_pos_loosely(Path(context.path) / arg, _get_pos)
 
 
 class SimpleScrollExecutor(CommandExecutor):
@@ -202,14 +206,24 @@ class SimpleRightClickExecutor(CommandExecutor):
 class SimpleDragExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         parsed_arg = ClickArgWithOffset(**json.loads(arg))
-        pyautogui.dragRel(parsed_arg.offset_x, parsed_arg.offset_y, duration=float(parsed_arg.arg))  # 使用 内容列来存持续时间，
-                                                                                                        # TODO img_name 这个命名不太好吧，要不要改改？
+        pyautogui.dragRel(
+            parsed_arg.offset_x, parsed_arg.offset_y, duration=float(parsed_arg.arg)
+        )  # 使用 内容列来存持续时间，
+
 
 class SimpleCommandExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         bat_file_path = Path(context.path) / arg
-        print(f"执行批处理文件: {bat_file_path}")  # print 会被重定向到图形界面 脚本运行状态 文本框
-        process = subprocess.Popen(['cmd', '/c', str(bat_file_path)], shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        print(
+            f"执行批处理文件: {bat_file_path}"
+        )  # print 会被重定向到图形界面 脚本运行状态 文本框
+        process = subprocess.Popen(
+            ['cmd', '/c', str(bat_file_path)],
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
         process.wait()
         stdout, stderr = process.communicate()
         print(stdout, stderr)
