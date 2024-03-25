@@ -11,6 +11,7 @@ class CommandType(Enum):
     SCROLL = 6
     HOTKEY = 7
     DRAG = 8
+    CMD = 9
 
 
 class Cosmic:

@@ -243,7 +243,7 @@ class GuiInteractionLayer(QWidget):
 
     # 限制文本框字数，自动清空
     def auto_clear_execute_status(self) -> None:
-        if len(self.ui.plainTextEdit_script_execute_status.toPlainText()) > 1000:
+        if len(self.ui.plainTextEdit_script_execute_status.toPlainText()) > 10000:
             self.ui.plainTextEdit_script_execute_status.clear()
 
 
