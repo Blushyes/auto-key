@@ -1,0 +1,6 @@
+{
+  "name": "测试调用命令提示符执行命令",
+  "description": "模拟执行“1.bat”，1.bat会调用2.ps1（可编辑1.bat实现提权），用于收集系统信息写入“info.txt”。",
+  "version": "1.0",
+  "author": "H1DDENADM1N"
+}

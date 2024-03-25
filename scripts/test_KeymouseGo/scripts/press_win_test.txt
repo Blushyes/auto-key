@@ -1,0 +1,11 @@
+[
+
+ [328,"EM","mouse left down",[24,1418]],
+ [105,"EM","mouse left up",[24,1418]],
+ [916,"EM","mouse left down",[24,1418]],
+ [128,"EM","mouse left up",[24,1418]],
+ [556,"EM","mouse left down",[24,1418]],
+ [146,"EM","mouse left up",[24,1418]],
+ [799,"EM","mouse left down",[24,1418]],
+ [142,"EM","mouse left up",[24,1418]]
+]
