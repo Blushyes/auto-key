@@ -91,7 +91,7 @@ class ExcelLoader(ScriptLoader):
                 return CommandExecutorWrapper(
                     executor_factory.create(CommandType(command_code)),
                     json.dumps(
-                        {"filename": arg, "offset_x": offset_x, "offset_y": offset_y}
+                        {"arg": arg, "offset_x": offset_x, "offset_y": offset_y}
                     ),
                     jump_to,
                 )

@@ -23,7 +23,7 @@ SECONDARY_SYMBOLS = ('-', '_', '.')
 
 @dataclass
 class ClickArgWithOffset:
-    filename: str
+    arg: str
     offset_x: int
     offset_y: int
 
@@ -49,7 +49,7 @@ def _get_pos(img_paths: Path | list[Path]) -> tuple[int, int] | None:
             i = (i + 1) % len(images)
             x, y = pyautogui.locateCenterOnScreen(images[i], confidence=0.9)
 
-            # NOTE MacBook的屏幕渲染分辨率和实际分辨率不是点对点的关系，可能和内建视网膜显示器有关
+            # NOTE MacBook的屏幕的渲染分辨率和实际分辨率不是点对点关系，可能和内建视网膜显示器有关
             # NOTE 需要将返回的坐标分别乘上0.5，这样才可以准确定位
             return (x * 0.5, y * 0.5) if platform.system() == 'Darwin' else (x, y)
         except pyautogui.ImageNotFoundException:
@@ -148,7 +148,7 @@ class SimpleMoveExecutor(CommandExecutor):
 class SimpleSingleClickExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         parsed_arg = ClickArgWithOffset(**json.loads(arg))
-        img_path = Path(context.path) / parsed_arg.filename
+        img_path = Path(context.path) / parsed_arg.arg
 
         pos = _get_pos_loosely(
             img_path,
@@ -166,7 +166,7 @@ class SimpleSingleClickExecutor(CommandExecutor):
 class SimpleDoubleClickExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         parsed_arg = ClickArgWithOffset(**json.loads(arg))
-        img_path = Path(context.path) / parsed_arg.filename
+        img_path = Path(context.path) / parsed_arg.arg
 
         pos = _get_pos_loosely(
             img_path,
@@ -184,7 +184,7 @@ class SimpleDoubleClickExecutor(CommandExecutor):
 class SimpleRightClickExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         parsed_arg = ClickArgWithOffset(**json.loads(arg))
-        img_path = Path(context.path) / parsed_arg.filename
+        img_path = Path(context.path) / parsed_arg.arg
 
         pos = _get_pos_loosely(
             img_path,
@@ -202,7 +202,7 @@ class SimpleRightClickExecutor(CommandExecutor):
 class SimpleDragExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         parsed_arg = ClickArgWithOffset(**json.loads(arg))
-        pyautogui.dragRel(parsed_arg.offset_x, parsed_arg.offset_y, duration=float(parsed_arg.filename))  # 使用 内容列来存持续时间，
+        pyautogui.dragRel(parsed_arg.offset_x, parsed_arg.offset_y, duration=float(parsed_arg.arg))  # 使用 内容列来存持续时间，
                                                                                                         # TODO img_name 这个命名不太好吧，要不要改改？
 
 class SimpleCommandExecutor(CommandExecutor):
