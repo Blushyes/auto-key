@@ -12,6 +12,7 @@ class CommandExecutorWrapper:
     jump_to: Optional[int] = None
 
 
+# TODO Jump功能
 def execute(context: ScriptInfo, script: list[CommandExecutorWrapper]):
     for wrapper in script:
         wrapper.executor.execute(context, wrapper.arg)

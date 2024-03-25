@@ -3,6 +3,7 @@ pyperclip==1.8.2
 pandas==2.1.2
 openpyxl==3.1.2
 opencv-python
-PySide6
-markdown2
-keyboard
+PySide6~=6.6.2
+markdown2~=2.4.13
+keyboard~=0.13.5
+pillow~=10.2.0

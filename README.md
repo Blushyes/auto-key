@@ -59,6 +59,12 @@
 
 > 你可以通过调用bat，调用Powershell、[KeymouseGo](https://github.com/taojy123/KeymouseGo) 或是其他，完成更复制的自动化。
 
+次要图片功能（同一条指令可指定不同图片）
+
+![img.png](assets/次要图片脚本.png)
+![baidu](assets/测试次要图片-百度.gif)
+![baidu](assets/测试次要图片-Bing.gif)
+
 ## 切换交互
 
 通过更改`config.json`中的`interaction`字段来切换交互
@@ -85,7 +91,7 @@
 ├─📄LICENSE
 ├─📜main.py                     # auto-key入口
 ├─✏️README.md
-├─✏️requirements.txt            # 依赖库
+├─✏️requirements.txt             # 依赖库
 ├─📁 scripts/                   # 脚本存放处
 ├─📁 context/
 │ ├─📜logging.py
@@ -104,7 +110,7 @@
 │ ├─ ├─✏️meta.json
 │ ├─📁 test_csv_file_script/
 │ └─📁 test_script/
-│ ├─✏️meta.example.json         # meta.json的示例
+│ ├─✏️meta.example.json          # meta.json的示例
 └─📁 script_loader/             # 脚本加载器，规定了一些关于脚本加载有关的接口
   └─📁 excel.py                 # Excel脚本加载器
 ```
