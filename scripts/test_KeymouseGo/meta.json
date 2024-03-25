@@ -1,0 +1,6 @@
+{
+  "name": "测试调用KeymouseGo",
+  "description": "模拟执行“1.bat”，1.bat会调用KeymouseGo，展开两次Win菜单。了解KeymouseGo https://github.com/taojy123/KeymouseGo",
+  "version": "1.0",
+  "author": "H1DDENADM1N"
+}

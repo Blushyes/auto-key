@@ -57,6 +57,8 @@
 > 指令类型 9
 > 内容 设置 bat名称，例如 1.bat
 
+> 你可以通过调用bat，调用Powershell、[KeymouseGo](https://github.com/taojy123/KeymouseGo) 或是其他，完成更复制的自动化。
+
 ## 切换交互
 
 通过更改`config.json`中的`interaction`字段来切换交互
