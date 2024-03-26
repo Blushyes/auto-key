@@ -6,13 +6,19 @@ from script_loader import ScriptInfo
 
 
 @dataclass
-class CommandExecutorWrapper:
+class ScriptStep:
     executor: CommandExecutor
     arg: str
     jump_to: Optional[int] = None
 
 
-# TODO Jump功能
-def execute(context: ScriptInfo, script: list[CommandExecutorWrapper]):
-    for wrapper in script:
-        wrapper.executor.execute(context, wrapper.arg)
+def execute(context: ScriptInfo, script: list[ScriptStep]):
+    i = 0
+    while i < len(script):
+        cmd = script[i]
+        cmd.executor.execute(context, cmd.arg)
+
+        if cmd.jump_to is not None:
+            i = cmd.jump_to
+        else:
+            i += 1

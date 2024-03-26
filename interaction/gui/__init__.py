@@ -6,7 +6,7 @@ from PySide6.QtCore import QThread, Signal, QObject, QTimer
 from PySide6.QtWidgets import QApplication, QWidget
 from markdown2 import markdown
 
-from executor import execute, CommandExecutorWrapper
+from executor import execute, ScriptStep
 from executor.external import Cosmic
 from interaction.gui.Ui_auto_key import Ui_auto_key
 from interaction import InteractionLayer
@@ -59,7 +59,7 @@ class WorkThread(QObject):
         self,
         redirect_output,
         script_info: ScriptInfo,
-        key_scripts: list[CommandExecutorWrapper],
+        key_scripts: list[ScriptStep],
         redo_times,
     ):
         super().__init__()
@@ -175,7 +175,7 @@ class GuiInteractionLayer(QWidget):
         self.get_select_path()
         # 加载脚本路径
         loader: ScriptLoader = ExcelLoader()
-        key_scripts: list[CommandExecutorWrapper] = loader.loads(self.select_path)
+        key_scripts: list[ScriptStep] = loader.loads(self.select_path)
 
         # 多线程执行脚本，避免阻塞图形界面
         self.ui.plainTextEdit_script_execute_status.appendPlainText(

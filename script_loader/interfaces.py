@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from executor import CommandExecutorWrapper
+from executor import ScriptStep
 
 
 class ScriptLoader(ABC):
@@ -10,7 +10,7 @@ class ScriptLoader(ABC):
     """
 
     @abstractmethod
-    def loads(self, path: Path | str) -> list[CommandExecutorWrapper]:
+    def loads(self, path: Path | str) -> list[ScriptStep]:
         """
         加载按键脚本
 

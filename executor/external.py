@@ -12,6 +12,10 @@ class CommandType(Enum):
     HOTKEY = 7
     DRAG = 8
     CMD = 9
+    JUST_LEFT_CLICK = 10
+    JUST_RIGHT_CLICK = 11
+    JUST_LEFT_PRESS = 12
+    JUST_RIGHT_PRESS = 13
 
 
 class Cosmic:

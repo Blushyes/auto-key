@@ -2,9 +2,9 @@ import json
 from pathlib import Path
 
 import pandas as pd
-from pandas import DataFrame, Series
+from pandas import DataFrame, Series, isna
 
-from executor import CommandExecutorWrapper
+from executor import ScriptStep
 from executor.external import CommandType
 from executor.interfaces import CommandExecutorFactory
 from executor.simple import SimpleCommandExecutorFactory
@@ -29,7 +29,6 @@ def _get_col(df: DataFrame, col_index: int) -> list | None:
         return None
 
     col: Series = df.iloc[:, col_index]
-    col = col.fillna(0)
     return col.to_list()
 
 
@@ -39,7 +38,7 @@ class ExcelLoader(ScriptLoader):
     """
 
     # TODO 后续再优化
-    def loads(self, path: Path | str) -> list[CommandExecutorWrapper]:
+    def loads(self, path: Path | str) -> list[ScriptStep]:
         if isinstance(path, str):
             path = Path(path)
 
@@ -62,6 +61,7 @@ class ExcelLoader(ScriptLoader):
                 case _:
                     raise Exception("不支持的脚本类型")
 
+        # TODO 表格优化为配置化（方便给表格添加列）
         df: DataFrame = read_excel()
         commands: list = _get_col(df, 0)
         contents: list = _get_col(df, 1)
@@ -69,18 +69,31 @@ class ExcelLoader(ScriptLoader):
         offset_x_list: list = _get_col(df, 3)
         offset_y_list: list = _get_col(df, 4)
 
+        # 给可选列赋默认值
         if jump_list is None:
             jump_list = [None] * len(commands)
+        else:
+            jump_list = [None if isna(jump_to) else jump_to for jump_to in jump_list]
+
         if offset_x_list is None:
             offset_x_list = [0] * len(commands)
+        else:
+            offset_x_list = [
+                0 if isna(offset_x) else offset_x for offset_x in offset_x_list
+            ]
+
         if offset_y_list is None:
             offset_y_list = [0] * len(commands)
+        else:
+            offset_y_list = [
+                0 if isna(offset_y) else offset_y for offset_y in offset_y_list
+            ]
 
         executor_factory: CommandExecutorFactory = SimpleCommandExecutorFactory()
 
         def assemble_wrapper(
             command_code: int, arg: str, jump_to: int, offset_x: int, offset_y: int
-        ) -> CommandExecutorWrapper:
+        ) -> ScriptStep:
             # NOTE 如果为单击、双击、右击、拖拽，需要将参数转换为json（因为需要设置offset）
             if (
                 command_code == CommandType.SINGLE_CLICK.value
@@ -88,7 +101,7 @@ class ExcelLoader(ScriptLoader):
                 or command_code == CommandType.RIGHT_CLICK.value
                 or command_code == CommandType.DRAG.value
             ):
-                return CommandExecutorWrapper(
+                return ScriptStep(
                     executor_factory.create(CommandType(command_code)),
                     json.dumps(
                         {"arg": arg, "offset_x": offset_x, "offset_y": offset_y}
@@ -96,7 +109,18 @@ class ExcelLoader(ScriptLoader):
                     jump_to,
                 )
 
-            return CommandExecutorWrapper(
+            if (
+                command_code == CommandType.MOVE.value
+                or command_code == CommandType.SCROLL.value
+            ):
+                x, y = map(int, arg.split(","))
+                return ScriptStep(
+                    executor_factory.create(CommandType(command_code)),
+                    json.dumps({'x': x, 'y': y, 'duration': 0.2}),
+                    jump_to,
+                )
+
+            return ScriptStep(
                 executor_factory.create(CommandType(command_code)), arg, jump_to
             )
 
