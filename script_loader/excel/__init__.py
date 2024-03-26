@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
-from pandas import DataFrame, Series
+from pandas import DataFrame, Series, isna
 
 from executor import CommandExecutorWrapper
 from executor.external import CommandType
@@ -29,7 +29,6 @@ def _get_col(df: DataFrame, col_index: int) -> list | None:
         return None
 
     col: Series = df.iloc[:, col_index]
-    col = col.fillna(0)
     return col.to_list()
 
 
@@ -69,12 +68,25 @@ class ExcelLoader(ScriptLoader):
         offset_x_list: list = _get_col(df, 3)
         offset_y_list: list = _get_col(df, 4)
 
+        # 给可选列赋默认值
         if jump_list is None:
             jump_list = [None] * len(commands)
+        else:
+            jump_list = [None if isna(jump_to) else jump_to for jump_to in jump_list]
+
         if offset_x_list is None:
             offset_x_list = [0] * len(commands)
+        else:
+            offset_x_list = [
+                0 if isna(offset_x) else offset_x for offset_x in offset_x_list
+            ]
+
         if offset_y_list is None:
             offset_y_list = [0] * len(commands)
+        else:
+            offset_y_list = [
+                0 if isna(offset_y) else offset_y for offset_y in offset_y_list
+            ]
 
         executor_factory: CommandExecutorFactory = SimpleCommandExecutorFactory()
 
