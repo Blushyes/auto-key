@@ -1,5 +1,7 @@
 import json
+import logging
 import platform
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
@@ -7,7 +9,9 @@ from typing import Callable
 import pyautogui
 import pyperclip
 from PIL import Image
+from pynput import mouse
 
+from context.utils import singleton
 from executor.external import CommandType, Cosmic
 from executor.interfaces import CommandExecutorFactory, CommandExecutor
 from executor.simple.format_hotkey_string import format_hotkey_string
@@ -21,11 +25,19 @@ import subprocess
 SECONDARY_SYMBOLS = ('-', '_', '.')
 
 
+# TODO 这些Arg交给Arg Register统一管理，实现配置化
 @dataclass
 class ClickArgWithOffset:
     arg: str
     offset_x: int
     offset_y: int
+
+
+@dataclass
+class CoordTransformWithDurationArg:
+    x: float
+    y: float
+    duration: float
 
 
 def _get_pos(img_paths: Path | list[Path]) -> tuple[int, int] | None:
@@ -97,6 +109,7 @@ def _get_pos_loosely(
     return handler(images)
 
 
+@singleton
 class SimpleCommandExecutorFactory(CommandExecutorFactory):
     def create(self, command_type: CommandType) -> CommandExecutor:
         executor_classes = {
@@ -110,6 +123,10 @@ class SimpleCommandExecutorFactory(CommandExecutorFactory):
             CommandType.RIGHT_CLICK: SimpleRightClickExecutor,
             CommandType.DRAG: SimpleDragExecutor,
             CommandType.CMD: SimpleCommandExecutor,
+            CommandType.JUST_LEFT_CLICK: SimpleJustLeftClickExecutor,
+            CommandType.JUST_RIGHT_CLICK: SimpleJustRightClickExecutor,
+            CommandType.JUST_LEFT_PRESS: SimpleJustLeftPressExecutor,
+            CommandType.JUST_RIGHT_PRESS: SimpleJustRightPressExecutor,
         }
         executor_class = executor_classes.get(command_type)
         if executor_class:
@@ -118,12 +135,14 @@ class SimpleCommandExecutorFactory(CommandExecutorFactory):
             raise ValueError(f"No executor available for command type: {command_type}")
 
 
+@singleton
 class SimpleInputExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         pyperclip.copy(arg)
         pyautogui.hotkey("command" if platform.system() == "Darwin" else "ctrl", "v")
 
 
+@singleton
 class SimpleWaitExecutor(CommandExecutor):
     """
     等待指定图片出现为止
@@ -133,22 +152,39 @@ class SimpleWaitExecutor(CommandExecutor):
         _get_pos_loosely(Path(context.path) / arg, _get_pos)
 
 
+@singleton
 class SimpleScrollExecutor(CommandExecutor):
+    def __init__(self):
+        self._controller = mouse.Controller()
+
     def execute(self, context: ScriptInfo, arg: str) -> None:
-        pyautogui.scroll(int(arg))
+        logging.debug(f'scroll: {arg}')
+        scroll_arg = CoordTransformWithDurationArg(**json.loads(arg))
+        self._controller.scroll(int(scroll_arg.x), int(scroll_arg.y))
+        time.sleep(scroll_arg.duration)
+        # pyautogui.scroll(int(arg))
 
 
+@singleton
 class SimpleHotkeyExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         pyautogui.hotkey(*format_hotkey_string(arg))
 
 
+@singleton
 class SimpleMoveExecutor(CommandExecutor):
+    def __init__(self):
+        self._controller = mouse.Controller()
+
     def execute(self, context: ScriptInfo, arg: str) -> None:
-        x, y = map(int, arg.split(","))
-        pyautogui.moveTo(x, y, duration=0.2)
+        move_arg = CoordTransformWithDurationArg(**json.loads(arg))
+        self._controller.position = (move_arg.x, move_arg.y)
+        time.sleep(move_arg.duration)
+        # pyautogui duration粒度不够，最小好像只能0.1秒
+        # pyautogui.moveTo(move_arg.x, move_arg.y, duration=move_arg.duration)
 
 
+@singleton
 class SimpleSingleClickExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         parsed_arg = ClickArgWithOffset(**json.loads(arg))
@@ -167,6 +203,7 @@ class SimpleSingleClickExecutor(CommandExecutor):
         pyautogui.click(x, y, interval=0.2, duration=0.2)
 
 
+@singleton
 class SimpleDoubleClickExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         parsed_arg = ClickArgWithOffset(**json.loads(arg))
@@ -185,6 +222,7 @@ class SimpleDoubleClickExecutor(CommandExecutor):
         pyautogui.click(x, y, interval=0.2, duration=0.2, clicks=2)
 
 
+@singleton
 class SimpleRightClickExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         parsed_arg = ClickArgWithOffset(**json.loads(arg))
@@ -203,6 +241,7 @@ class SimpleRightClickExecutor(CommandExecutor):
         pyautogui.click(x, y, interval=0.2, duration=0.2, button="right")
 
 
+@singleton
 class SimpleDragExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         parsed_arg = ClickArgWithOffset(**json.loads(arg))
@@ -211,6 +250,7 @@ class SimpleDragExecutor(CommandExecutor):
         )  # 使用 内容列来存持续时间，
 
 
+@singleton
 class SimpleCommandExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: str) -> None:
         bat_file_path = Path(context.path) / arg
@@ -227,3 +267,27 @@ class SimpleCommandExecutor(CommandExecutor):
         process.wait()
         stdout, stderr = process.communicate()
         print(stdout, stderr)
+
+
+@singleton
+class SimpleJustLeftClickExecutor(CommandExecutor):
+    def execute(self, context: ScriptInfo, arg: str) -> None:
+        pyautogui.click()
+
+
+@singleton
+class SimpleJustRightClickExecutor(CommandExecutor):
+    def execute(self, context: ScriptInfo, arg: str) -> None:
+        pyautogui.click(button='right')
+
+
+@singleton
+class SimpleJustLeftPressExecutor(CommandExecutor):
+    def execute(self, context: ScriptInfo, arg: str) -> None:
+        pyautogui.press('left')
+
+
+@singleton
+class SimpleJustRightPressExecutor(CommandExecutor):
+    def execute(self, context: ScriptInfo, arg: str) -> None:
+        pyautogui.press('right')

@@ -3,13 +3,15 @@ import pathlib
 
 from context.logging import logger
 from script_loader.external import ScriptInfo
+from os.path import exists
 
 SCRIPT_DIR = pathlib.Path('scripts')
 METADATA_NAME = 'meta.json'
 METADATA_EXAMPLE_PATH = SCRIPT_DIR / 'meta.example.json'
 
-with open(METADATA_EXAMPLE_PATH, 'r', encoding='utf-8') as f:
-    DEFAULT_METADATA: str = f.read()
+if exists(METADATA_EXAMPLE_PATH):
+    with open(METADATA_EXAMPLE_PATH, 'r', encoding='utf-8') as f:
+        DEFAULT_METADATA: str = f.read()
 
 
 def pick_scripts() -> list[ScriptInfo]:

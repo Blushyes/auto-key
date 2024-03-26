@@ -1,4 +1,4 @@
-from executor import CommandExecutorWrapper, execute
+from executor import ScriptStep, execute
 from interaction import InteractionLayer
 from script_loader.excel.__init__ import ExcelLoader
 from script_loader.interfaces import ScriptLoader
@@ -38,6 +38,6 @@ class CommandLineInteractionLayer(InteractionLayer):
                 continue
             select_path = scripts[select_script_index].path
             loader: ScriptLoader = ExcelLoader()
-            key_scripts: list[CommandExecutorWrapper] = loader.loads(select_path)
+            key_scripts: list[ScriptStep] = loader.loads(select_path)
             execute(scripts[select_script_index], key_scripts)
             print("脚本执行完毕")

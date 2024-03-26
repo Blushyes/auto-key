@@ -6,13 +6,13 @@ from script_loader import ScriptInfo
 
 
 @dataclass
-class CommandExecutorWrapper:
+class ScriptStep:
     executor: CommandExecutor
     arg: str
     jump_to: Optional[int] = None
 
 
-def execute(context: ScriptInfo, script: list[CommandExecutorWrapper]):
+def execute(context: ScriptInfo, script: list[ScriptStep]):
     i = 0
     while i < len(script):
         cmd = script[i]
