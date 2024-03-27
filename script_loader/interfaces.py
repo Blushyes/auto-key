@@ -2,21 +2,13 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 from executor import ScriptStep
+from script_loader import ScriptInfo
 
 
 class ScriptLoader(ABC):
-    """
-    脚本加载器
-    """
 
     @abstractmethod
-    def loads(self, path: Path | str) -> list[ScriptStep]:
-        """
-        加载按键脚本
+    def loads(self, path: Path | str) -> list[ScriptStep]: ...
 
-        Args:
-            path: 脚本的路径
-
-        Returns: 解析好的脚本链表对象头节点
-        """
-        ...
+    @abstractmethod
+    def save(self, script: list[ScriptStep], info: ScriptInfo) -> None: ...

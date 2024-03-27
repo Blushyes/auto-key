@@ -1,11 +1,12 @@
 import json
-import pathlib
+import os
 from os.path import exists
+from pathlib import Path
 
 from context.logging import logger
 from script_loader.external import ScriptInfo
 
-SCRIPT_DIR = pathlib.Path('scripts')
+SCRIPT_DIR: Path = Path('scripts')
 METADATA_NAME = 'meta.json'
 METADATA_EXAMPLE_PATH = SCRIPT_DIR / 'meta.example.json'
 
@@ -22,7 +23,7 @@ def pick_scripts() -> list[ScriptInfo]:
         所有脚本的信息
     """
 
-    def load_metadata(script_path: pathlib.Path) -> dict:
+    def load_metadata(script_path: Path) -> dict:
         metadata_path = script_path / METADATA_NAME
         if not metadata_path.exists():
             logger.warning('脚本不存在meta.json文件')
@@ -50,3 +51,7 @@ def pick_scripts() -> list[ScriptInfo]:
     for script in scripts:
         logger.debug(script)
     return scripts
+
+
+def script_exist(name: str) -> bool:
+    return os.path.exists(SCRIPT_DIR / name)

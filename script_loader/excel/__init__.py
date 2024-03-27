@@ -9,6 +9,7 @@ from executor import ScriptStep
 from executor.external import CommandType
 from executor.interfaces import CommandExecutorFactory
 from executor.simple import SimpleCommandExecutorFactory
+from script_loader import ScriptInfo, SCRIPT_DIR
 from script_loader.interfaces import ScriptLoader
 
 # 脚本文件名
@@ -142,3 +143,17 @@ class ExcelLoader(ScriptLoader):
             )
 
         return script
+
+    def save(self, script: list[ScriptStep], info: ScriptInfo) -> None:
+        with open(Path(info.path) / COLUMNS_CONFIG, 'w', encoding='utf-8') as f:
+            json.dump(
+                {
+                    'name': info.name,
+                    'description': info.description,
+                    'version': info.version,
+                    'author': info.author,
+                },
+                f,
+                ensure_ascii=False,
+                indent=2,
+            )
