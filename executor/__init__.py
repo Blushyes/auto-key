@@ -15,7 +15,7 @@ class ScriptStep:
 def execute(context: ScriptInfo, script: list[ScriptStep]):
     i = 0
     while i < len(script):
-        cmd = script[i]
+        cmd: ScriptStep = script[i]
         cmd.executor.execute(context, cmd.arg)
 
         if cmd.jump_to is not None:

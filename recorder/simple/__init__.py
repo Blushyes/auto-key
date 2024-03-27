@@ -72,7 +72,11 @@ class SimpleRecorder(Recorder):
             ScriptStep(
                 self._executor_factory.create(CommandType.SCROLL),
                 json.dumps(
-                    {'x': dx, 'y': dy, 'duration': (cur_time := time()) - self._pre_time}
+                    {
+                        'x': dx,
+                        'y': dy,
+                        'duration': (cur_time := time()) - self._pre_time,
+                    }
                 ),
             )
         )
@@ -90,7 +94,12 @@ class SimpleRecorder(Recorder):
     def start(self):
         self._pre_time = time()
         self._mouse_listener.start()
+
+        # NOTE 这个wait()很关键 See https://github.com/moses-palmer/pynput/issues/55
+        # NOTE 不然不可以同时使用mouse_listener和keyboard_listener
+        self._mouse_listener.wait()
         self._keyboard_listener.start()
+        self._keyboard_listener.wait()
 
     # TODO 之后再实现
     def stop(self):

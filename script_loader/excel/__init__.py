@@ -1,4 +1,6 @@
+import csv
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -9,7 +11,7 @@ from executor import ScriptStep
 from executor.external import CommandType
 from executor.interfaces import CommandExecutorFactory
 from executor.simple import SimpleCommandExecutorFactory
-from script_loader import ScriptInfo, SCRIPT_DIR
+from script_loader import ScriptInfo, METADATA_NAME
 from script_loader.interfaces import ScriptLoader
 
 # 脚本文件名
@@ -28,6 +30,12 @@ class ExcelColMeta:
     description: str
     optional: bool
     default_value: str | int | float | None
+
+
+# 加载Excel列配置
+with open(Path(__file__).parent / COLUMNS_CONFIG, 'r', encoding='utf-8') as f:
+    COL_METAS = json.load(f)
+    COL_METAS = [ExcelColMeta(**meta) for meta in COL_METAS]
 
 
 def _get_col(df: DataFrame, col_index: int) -> list | None:
@@ -78,10 +86,13 @@ class ExcelLoader(ScriptLoader):
             command_code == CommandType.MOVE.value
             or command_code == CommandType.SCROLL.value
         ):
-            x, y = map(int, content.split(","))
+            # TODO 暂时用|分隔，之后考虑更好的方案（用','分隔会导致csv文件出错）
+            x, y, duration = map(float, content.split("|"))
             return ScriptStep(
                 self._executor_factory.create(CommandType(command_code)),
-                json.dumps({'x': x, 'y': y, 'duration': 0.2}),
+                json.dumps(
+                    {'x': x, 'y': y, 'duration': 0.2 if duration is None else duration}
+                ),
                 jump_to,
             )
 
@@ -115,17 +126,14 @@ class ExcelLoader(ScriptLoader):
 
         # 读取表格
         df: DataFrame = read_excel()
-        with open(Path(__file__).parent / COLUMNS_CONFIG, 'r', encoding='utf-8') as f:
-            col_metas = json.load(f)
-            col_metas = [ExcelColMeta(**meta) for meta in col_metas]
 
         # 读取列数据并且处理默认值
         cols = []
-        for i, meta in enumerate(col_metas):
+        for i, meta in enumerate(COL_METAS):
             col = _get_col(df, i)
             if col is None:
                 if meta.optional:
-                    col = [meta.default_value] * df.shape[1]
+                    col = [meta.default_value] * df.shape[0]
                 else:
                     raise Exception(f"第{i + 1}列不存在")
             else:
@@ -138,14 +146,16 @@ class ExcelLoader(ScriptLoader):
             # 根据name进行传参，所以name必须跟assemble_script_step函数的参数名一一对应
             script.append(
                 self._assemble_script_step(
-                    **{col_metas[j].name: cols[j][i] for j in range(len(cols))}
+                    **{COL_METAS[j].name: cols[j][i] for j in range(len(cols))}
                 )
             )
 
         return script
 
     def save(self, script: list[ScriptStep], info: ScriptInfo) -> None:
-        with open(Path(info.path) / COLUMNS_CONFIG, 'w', encoding='utf-8') as f:
+        os.mkdir(info.path)
+
+        with open(Path(info.path) / METADATA_NAME, 'w') as f:
             json.dump(
                 {
                     'name': info.name,
@@ -157,3 +167,25 @@ class ExcelLoader(ScriptLoader):
                 ensure_ascii=False,
                 indent=2,
             )
+
+        csv_script = [['指令', '内容']]
+
+        for step in script:
+            # 如果为Json，则需要解析
+            # TODO 优化
+            if '{' in str(step.arg):
+                arg_dict: dict = json.loads(step.arg)
+                step.arg = '|'.join(map(str, arg_dict.values()))
+
+            csv_script.append(
+                (self._executor_factory.typeof(step.executor).value, step.arg)
+            )
+
+        with open(Path(info.path) / 'index.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(csv_script)
+
+        for step in csv_script:
+            print(step)
+
+        print('已保存')

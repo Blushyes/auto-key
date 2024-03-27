@@ -1,9 +1,12 @@
+import time
+from pathlib import Path
+
 import keyboard
 
 from executor import ScriptStep, execute
 from interaction import InteractionLayer
 from recorder.simple import SimpleRecorder
-from script_loader import pick_scripts, ScriptInfo, script_exist
+from script_loader import pick_scripts, ScriptInfo, script_exist, SCRIPT_DIR
 from script_loader.excel import ExcelLoader
 from script_loader.interfaces import ScriptLoader
 
@@ -61,7 +64,7 @@ def _record_script():
         case "1":
             while True:
                 name = input('请输入脚本名：')
-                if name != '':
+                if name == '':
                     print("脚本名不能为空")
                     continue
                 if script_exist(name):
@@ -78,14 +81,16 @@ def _record_script():
             author = input('请输入脚本作者：')
             if author == '':
                 author = '未知'
-            loader.save(script, ScriptInfo(name, description, version, author))
+            loader.save(
+                script,
+                ScriptInfo(Path(SCRIPT_DIR) / name, description, version, author),
+            )
             print("脚本保存完毕")
         case "2":
             execute(..., script)
             print("脚本执行完毕")
         case _:
             print("未知的指令")
-            return
 
 
 class CommandLineInteractionLayer(InteractionLayer):
@@ -102,4 +107,3 @@ class CommandLineInteractionLayer(InteractionLayer):
                 _record_script()
             case _:
                 print("未知的指令")
-                return

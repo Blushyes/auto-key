@@ -109,8 +109,8 @@ def _get_pos_loosely(
 
 @singleton
 class SimpleCommandExecutorFactory(CommandExecutorFactory):
-    def create(self, command_type: CommandType) -> CommandExecutor:
-        executor_classes = {
+    def __init__(self):
+        self._command_to_executor = {
             CommandType.INPUT: SimpleInputExecutor,
             CommandType.WAIT: SimpleWaitExecutor,
             CommandType.SCROLL: SimpleScrollExecutor,
@@ -126,11 +126,23 @@ class SimpleCommandExecutorFactory(CommandExecutorFactory):
             CommandType.JUST_LEFT_PRESS: SimpleJustLeftPressExecutor,
             CommandType.JUST_RIGHT_PRESS: SimpleJustRightPressExecutor,
         }
-        executor_class = executor_classes.get(command_type)
+
+        self._executor_to_command = {
+            type(executor()): command
+            for command, executor in self._command_to_executor.items()
+        }
+
+        print(self._executor_to_command)
+
+    def create(self, command_type: CommandType) -> CommandExecutor:
+        executor_class = self._command_to_executor.get(command_type)
         if executor_class:
             return executor_class()
         else:
             raise ValueError(f"No executor available for command type: {command_type}")
+
+    def typeof(self, executor: CommandExecutor) -> CommandType:
+        return self._executor_to_command.get(type(executor))
 
 
 @singleton

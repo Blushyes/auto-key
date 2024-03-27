@@ -12,3 +12,6 @@ class CommandExecutor(ABC):
 class CommandExecutorFactory(ABC):
     @abstractmethod
     def create(self, command_type: CommandType) -> CommandExecutor: ...
+
+    @abstractmethod
+    def typeof(self, executor: CommandExecutor) -> CommandType: ...
