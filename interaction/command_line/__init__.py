@@ -1,4 +1,3 @@
-import time
 from pathlib import Path
 
 import keyboard
@@ -59,38 +58,43 @@ def _record_script():
     print('请选择：')
     print('1. 保存录制')
     print('2. 回放')
-    code = input('请输入：')
-    match code:
-        case "1":
-            while True:
-                name = input('请输入脚本名：')
-                if name == '':
-                    print("脚本名不能为空")
-                    continue
-                if script_exist(name):
-                    print("脚本已存在")
-                    continue
-                break
+    while True:
+        code = input('请输入：')
+        match code:
+            case "1":
+                while True:
+                    name = input('请输入脚本名：')
+                    if name == '':
+                        print("脚本名不能为空")
+                        continue
+                    if script_exist(name):
+                        print("脚本已存在")
+                        continue
+                    break
 
-            description = input('请输入脚本描述：')
-            if description == '':
-                description = '未知'
-            version = input('请输入脚本版本号：')
-            if version == '':
-                version = '0.0.1'
-            author = input('请输入脚本作者：')
-            if author == '':
-                author = '未知'
-            loader.save(
-                script,
-                ScriptInfo(Path(SCRIPT_DIR) / name, description, version, author),
-            )
-            print("脚本保存完毕")
-        case "2":
-            execute(..., script)
-            print("脚本执行完毕")
-        case _:
-            print("未知的指令")
+                description = input('请输入脚本描述：')
+                if description == '':
+                    description = '未知'
+                version = input('请输入脚本版本号：')
+                if version == '':
+                    version = '0.0.1'
+                author = input('请输入脚本作者：')
+                if author == '':
+                    author = '未知'
+                loader.save(
+                    script,
+                    ScriptInfo(
+                        Path(SCRIPT_DIR) / name, name, description, version, author
+                    ),
+                )
+                print("脚本保存完毕")
+                return
+            case "2":
+                execute(..., script)
+                print("脚本执行完毕")
+                return
+            case _:
+                print("未知的指令")
 
 
 class CommandLineInteractionLayer(InteractionLayer):
