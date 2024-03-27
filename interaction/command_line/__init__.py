@@ -1,8 +1,8 @@
 from executor import ScriptStep, execute
 from interaction import InteractionLayer
+from script_loader import pick_scripts, ScriptInfo
 from script_loader.excel.__init__ import ExcelLoader
 from script_loader.interfaces import ScriptLoader
-from script_loader import pick_scripts, ScriptInfo
 
 
 class Command:

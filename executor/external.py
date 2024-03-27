@@ -2,20 +2,20 @@ from enum import Enum
 
 
 class CommandType(Enum):
-    MOVE = 0
-    SINGLE_CLICK = 1
-    DOUBLE_CLICK = 2
-    RIGHT_CLICK = 3
-    INPUT = 4
-    WAIT = 5
-    SCROLL = 6
-    HOTKEY = 7
-    DRAG = 8
-    CMD = 9
-    JUST_LEFT_CLICK = 10
-    JUST_RIGHT_CLICK = 11
-    JUST_LEFT_PRESS = 12
-    JUST_RIGHT_PRESS = 13
+    MOVE = 'move'
+    SINGLE_CLICK = 'click'
+    DOUBLE_CLICK = 'db_click'
+    RIGHT_CLICK = 'r_click'
+    INPUT = 'input'
+    WAIT = 'wait'
+    SCROLL = 'scroll'
+    HOTKEY = 'key'
+    DRAG = 'drag'
+    CMD = 'cmd'
+    JUST_LEFT_CLICK = 'just_click'
+    JUST_RIGHT_CLICK = 'just_r_click'
+    JUST_LEFT_PRESS = 'just_press'
+    JUST_RIGHT_PRESS = 'just_r_press'
 
 
 class Cosmic:

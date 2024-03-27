@@ -8,12 +8,12 @@ from markdown2 import markdown
 
 from executor import execute, ScriptStep
 from executor.external import Cosmic
-from interaction.gui.Ui_auto_key import Ui_auto_key
 from interaction import InteractionLayer
+from interaction.gui.Ui_auto_key import Ui_auto_key
 from interaction.gui.shortcut_handler import bond_shortcut
+from script_loader import pick_scripts, ScriptInfo
 from script_loader.excel.__init__ import ExcelLoader
 from script_loader.interfaces import ScriptLoader
-from script_loader import pick_scripts, ScriptInfo
 
 
 class Command:

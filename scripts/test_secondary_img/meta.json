@@ -1,6 +1,6 @@
 {
   "name": "测试次要图片",
   "description": "同一个图片可以有不同版本，找到其中一个就可以点击",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Blushyes"
 }
