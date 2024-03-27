@@ -1,6 +1,7 @@
 import json
 import logging
 import platform
+import subprocess
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,9 +17,6 @@ from executor.external import CommandType, Cosmic
 from executor.interfaces import CommandExecutorFactory, CommandExecutor
 from executor.simple.format_hotkey_string import format_hotkey_string
 from script_loader import ScriptInfo
-
-import subprocess
-
 
 # NOTE 用于分隔次要图片，比如arg的图片为hello.png，那么hello-1.png和hello-2.png以及hello_1.png都会被尝试读取坐标
 # NOTE 只要有一张图片能读取到坐标即可返回

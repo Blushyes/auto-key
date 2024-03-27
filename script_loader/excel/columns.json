@@ -1,0 +1,32 @@
+[
+    {
+        "name": "command_code",
+        "description": "指令",
+        "optional": false,
+        "default_value": null
+    },
+    {
+        "name": "content",
+        "description": "内容",
+        "optional": false,
+        "default_value": ""
+    },
+    {
+        "name": "jump_to",
+        "description": "跳转",
+        "optional": true,
+        "default_value": null
+    },
+    {
+        "name": "offset_x",
+        "description": "横向偏移量 offset_x",
+        "optional": true,
+        "default_value": 0
+    },
+    {
+        "name": "offset_y",
+        "description": "纵向偏移量 offset_y",
+        "optional": true,
+        "default_value": 0
+    }
+]

@@ -1,4 +1,5 @@
 import json
+from time import time
 
 from pynput import mouse, keyboard
 from pynput.mouse import Button
@@ -8,7 +9,6 @@ from executor.external import CommandType
 from executor.interfaces import CommandExecutorFactory
 from executor.simple import SimpleCommandExecutorFactory
 from recorder.interfaces import Recorder
-from time import time
 
 
 class SimpleRecorder(Recorder):
@@ -49,7 +49,7 @@ class SimpleRecorder(Recorder):
         if button == Button.left and not pressed:
             command_type = CommandType.JUST_LEFT_CLICK
         elif button == Button.right and not pressed:
-            command_type = CommandType.JUST_RIGHT_CLICK
+            command_type = CommandType.RIGHT_CLICK
         elif button == Button.left and pressed:
             command_type = CommandType.JUST_LEFT_PRESS
         elif button == Button.right and pressed:

@@ -1,9 +1,9 @@
 import json
 import pathlib
+from os.path import exists
 
 from context.logging import logger
 from script_loader.external import ScriptInfo
-from os.path import exists
 
 SCRIPT_DIR = pathlib.Path('scripts')
 METADATA_NAME = 'meta.json'
