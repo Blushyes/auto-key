@@ -67,7 +67,6 @@ class SimpleRecorder(Recorder):
 
     # TODO 后续需要优化
     def _on_mouse_scroll(self, x, y, dx, dy):
-        print(x, y, dx, dy)
         self._steps.append(
             ScriptStep(
                 self._executor_factory.create(CommandType.SCROLL),

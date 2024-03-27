@@ -132,8 +132,6 @@ class SimpleCommandExecutorFactory(CommandExecutorFactory):
             for command, executor in self._command_to_executor.items()
         }
 
-        print(self._executor_to_command)
-
     def create(self, command_type: CommandType) -> CommandExecutor:
         executor_class = self._command_to_executor.get(command_type)
         if executor_class:
@@ -168,7 +166,6 @@ class SimpleScrollExecutor(CommandExecutor):
         self._controller = mouse.Controller()
 
     def execute(self, context: ScriptInfo, arg: str) -> None:
-        logging.debug(f'scroll: {arg}')
         scroll_arg = CoordTransformWithDurationArg(**json.loads(arg))
         self._controller.scroll(int(scroll_arg.x), int(scroll_arg.y))
         time.sleep(scroll_arg.duration)
