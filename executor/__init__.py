@@ -1,16 +1,15 @@
 from dataclasses import dataclass
-from typing import Optional
-
-from executor.interfaces import CommandExecutor
-from script_loader import ScriptInfo
-
+from typing import Optional, Any
 
 from executor.external import Cosmic
+from executor.interfaces import CommandExecutor
+from script_loader.external import ScriptInfo
+
 
 @dataclass
 class ScriptStep:
     executor: CommandExecutor
-    arg: str
+    arg: Any
     jump_to: Optional[int] = None
 
 

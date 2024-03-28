@@ -1,9 +1,6 @@
-import json
-import logging
 import platform
 import subprocess
 import time
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
 
@@ -13,7 +10,12 @@ from PIL import Image
 from pynput import mouse
 
 from context.utils import singleton
-from executor.external import CommandType, Cosmic
+from executor.external import (
+    CommandType,
+    Cosmic,
+    CoordTransformWithDurationArg,
+    ClickArgWithOffset,
+)
 from executor.interfaces import CommandExecutorFactory, CommandExecutor
 from executor.simple.format_hotkey_string import format_hotkey_string
 from script_loader import ScriptInfo
@@ -21,21 +23,6 @@ from script_loader import ScriptInfo
 # NOTE 用于分隔次要图片，比如arg的图片为hello.png，那么hello-1.png和hello-2.png以及hello_1.png都会被尝试读取坐标
 # NOTE 只要有一张图片能读取到坐标即可返回
 SECONDARY_SYMBOLS = ('-', '_', '.')
-
-
-# TODO 这些Arg交给Arg Register统一管理，实现配置化
-@dataclass
-class ClickArgWithOffset:
-    arg: str
-    offset_x: int
-    offset_y: int
-
-
-@dataclass
-class CoordTransformWithDurationArg:
-    x: float
-    y: float
-    duration: float
 
 
 def _get_pos(img_paths: Path | list[Path]) -> tuple[int, int] | None:
@@ -165,10 +152,9 @@ class SimpleScrollExecutor(CommandExecutor):
     def __init__(self):
         self._controller = mouse.Controller()
 
-    def execute(self, context: ScriptInfo, arg: str) -> None:
-        scroll_arg = CoordTransformWithDurationArg(**json.loads(arg))
-        self._controller.scroll(int(scroll_arg.x), int(scroll_arg.y))
-        time.sleep(scroll_arg.duration)
+    def execute(self, context: ScriptInfo, arg: CoordTransformWithDurationArg) -> None:
+        self._controller.scroll(int(arg.x), int(arg.y))
+        time.sleep(arg.duration)
         # pyautogui.scroll(int(arg))
 
 
@@ -183,25 +169,21 @@ class SimpleMoveExecutor(CommandExecutor):
     def __init__(self):
         self._controller = mouse.Controller()
 
-    def execute(self, context: ScriptInfo, arg: str) -> None:
-        move_arg = CoordTransformWithDurationArg(**json.loads(arg))
-        self._controller.position = (move_arg.x, move_arg.y)
-        time.sleep(move_arg.duration)
+    def execute(self, context: ScriptInfo, arg: CoordTransformWithDurationArg) -> None:
+        self._controller.position = (arg.x, arg.y)
+        time.sleep(arg.duration)
         # pyautogui duration粒度不够，最小好像只能0.1秒
         # pyautogui.moveTo(move_arg.x, move_arg.y, duration=move_arg.duration)
 
 
 @singleton
 class SimpleSingleClickExecutor(CommandExecutor):
-    def execute(self, context: ScriptInfo, arg: str) -> None:
-        parsed_arg = ClickArgWithOffset(**json.loads(arg))
-        img_path = Path(context.path) / parsed_arg.arg
+    def execute(self, context: ScriptInfo, arg: ClickArgWithOffset) -> None:
+        img_path = Path(context.path) / arg.arg
 
         pos = _get_pos_loosely(
             img_path,
-            lambda images: _get_pos_with_offset(
-                images, parsed_arg.offset_x, parsed_arg.offset_y
-            ),
+            lambda images: _get_pos_with_offset(images, arg.offset_x, arg.offset_y),
         )
         if pos is None:
             return
@@ -212,15 +194,12 @@ class SimpleSingleClickExecutor(CommandExecutor):
 
 @singleton
 class SimpleDoubleClickExecutor(CommandExecutor):
-    def execute(self, context: ScriptInfo, arg: str) -> None:
-        parsed_arg = ClickArgWithOffset(**json.loads(arg))
-        img_path = Path(context.path) / parsed_arg.arg
+    def execute(self, context: ScriptInfo, arg: ClickArgWithOffset) -> None:
+        img_path = Path(context.path) / arg.arg
 
         pos = _get_pos_loosely(
             img_path,
-            lambda images: _get_pos_with_offset(
-                images, parsed_arg.offset_x, parsed_arg.offset_y
-            ),
+            lambda images: _get_pos_with_offset(images, arg.offset_x, arg.offset_y),
         )
         if pos is None:
             return
@@ -231,15 +210,12 @@ class SimpleDoubleClickExecutor(CommandExecutor):
 
 @singleton
 class SimpleRightClickExecutor(CommandExecutor):
-    def execute(self, context: ScriptInfo, arg: str) -> None:
-        parsed_arg = ClickArgWithOffset(**json.loads(arg))
-        img_path = Path(context.path) / parsed_arg.arg
+    def execute(self, context: ScriptInfo, arg: ClickArgWithOffset) -> None:
+        img_path = Path(context.path) / arg.arg
 
         pos = _get_pos_loosely(
             img_path,
-            lambda images: _get_pos_with_offset(
-                images, parsed_arg.offset_x, parsed_arg.offset_y
-            ),
+            lambda images: _get_pos_with_offset(images, arg.offset_x, arg.offset_y),
         )
         if pos is None:
             return
@@ -250,10 +226,9 @@ class SimpleRightClickExecutor(CommandExecutor):
 
 @singleton
 class SimpleDragExecutor(CommandExecutor):
-    def execute(self, context: ScriptInfo, arg: str) -> None:
-        parsed_arg = ClickArgWithOffset(**json.loads(arg))
+    def execute(self, context: ScriptInfo, arg: ClickArgWithOffset) -> None:
         pyautogui.dragRel(
-            parsed_arg.offset_x, parsed_arg.offset_y, duration=float(parsed_arg.arg)
+            arg.offset_x, arg.offset_y, duration=float(arg.arg)
         )  # 使用 内容列来存持续时间，
 
 

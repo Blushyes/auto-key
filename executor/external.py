@@ -1,4 +1,6 @@
+from dataclasses import dataclass
 from enum import Enum
+from typing import Any, TypeVar
 
 
 class CommandType(Enum):
@@ -28,3 +30,48 @@ class Cosmic:
     pause_script_shortcut = "F9"  # 暂停脚本快捷键
     do_run_script = False  # 是否运行脚本
     do_pause_script = False  # 是否暂停脚本
+
+
+class SeparableArg:
+    SEP: str = '|'
+
+    def __str__(self):
+        attributes = [
+            str(getattr(self, attr))
+            for attr in dir(self)
+            if not attr.startswith('__') and not callable(getattr(self, attr))
+        ]
+        return SeparableArg.SEP.join(attributes)
+
+
+@dataclass
+class ClickArgWithOffset(SeparableArg):
+    arg: str
+    offset_x: int
+    offset_y: int
+
+
+@dataclass
+class CoordTransformWithDurationArg(SeparableArg):
+    x: float
+    y: float
+    duration: float
+
+
+# NOTE 指令类型以及其执行器接收的参数的类型
+ARG_MAPPING = {
+    CommandType.INPUT: str,
+    CommandType.WAIT: str,
+    CommandType.SCROLL: CoordTransformWithDurationArg,
+    CommandType.HOTKEY: str,
+    CommandType.MOVE: CoordTransformWithDurationArg,
+    CommandType.SINGLE_CLICK: ClickArgWithOffset,
+    CommandType.DOUBLE_CLICK: ClickArgWithOffset,
+    CommandType.RIGHT_CLICK: ClickArgWithOffset,
+    CommandType.DRAG: str,
+    CommandType.CMD: str,
+    CommandType.JUST_LEFT_CLICK: CoordTransformWithDurationArg,
+    CommandType.JUST_RIGHT_CLICK: CoordTransformWithDurationArg,
+    CommandType.JUST_LEFT_PRESS: CoordTransformWithDurationArg,
+    CommandType.JUST_RIGHT_PRESS: CoordTransformWithDurationArg,
+}
