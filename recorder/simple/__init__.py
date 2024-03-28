@@ -54,12 +54,7 @@ class SimpleRecorder(Recorder):
         if command_type is None:
             return
 
-        self._steps.append(
-            ScriptStep(
-                self._executor_factory.create(command_type),
-                '',
-            )
-        )
+        self._steps.append(ScriptStep(self._executor_factory.create(command_type), ''))
 
     # TODO 后续需要优化
     def _on_mouse_scroll(self, x, y, dx, dy):

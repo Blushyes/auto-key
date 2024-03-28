@@ -70,8 +70,8 @@ ARG_MAPPING = {
     CommandType.RIGHT_CLICK: ClickArgWithOffset,
     CommandType.DRAG: str,
     CommandType.CMD: str,
-    CommandType.JUST_LEFT_CLICK: CoordTransformWithDurationArg,
-    CommandType.JUST_RIGHT_CLICK: CoordTransformWithDurationArg,
-    CommandType.JUST_LEFT_PRESS: CoordTransformWithDurationArg,
-    CommandType.JUST_RIGHT_PRESS: CoordTransformWithDurationArg,
+    CommandType.JUST_LEFT_CLICK: ...,
+    CommandType.JUST_RIGHT_CLICK: ...,
+    CommandType.JUST_LEFT_PRESS: ...,
+    CommandType.JUST_RIGHT_PRESS: ...,
 }

@@ -2,12 +2,13 @@ import platform
 import subprocess
 import time
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Any
 
 import pyautogui
 import pyperclip
 from PIL import Image
 from pynput import mouse
+from pynput.mouse import Button
 
 from context.utils import singleton
 from executor.external import (
@@ -23,6 +24,8 @@ from script_loader import ScriptInfo
 # NOTE 用于分隔次要图片，比如arg的图片为hello.png，那么hello-1.png和hello-2.png以及hello_1.png都会被尝试读取坐标
 # NOTE 只要有一张图片能读取到坐标即可返回
 SECONDARY_SYMBOLS = ('-', '_', '.')
+
+MOUSE_CONTROLLER = mouse.Controller()
 
 
 def _get_pos(img_paths: Path | list[Path]) -> tuple[int, int] | None:
@@ -149,11 +152,8 @@ class SimpleWaitExecutor(CommandExecutor):
 
 @singleton
 class SimpleScrollExecutor(CommandExecutor):
-    def __init__(self):
-        self._controller = mouse.Controller()
-
     def execute(self, context: ScriptInfo, arg: CoordTransformWithDurationArg) -> None:
-        self._controller.scroll(int(arg.x), int(arg.y))
+        MOUSE_CONTROLLER.scroll(int(arg.x), int(arg.y))
         time.sleep(arg.duration)
         # pyautogui.scroll(int(arg))
 
@@ -166,14 +166,10 @@ class SimpleHotkeyExecutor(CommandExecutor):
 
 @singleton
 class SimpleMoveExecutor(CommandExecutor):
-    def __init__(self):
-        self._controller = mouse.Controller()
 
     def execute(self, context: ScriptInfo, arg: CoordTransformWithDurationArg) -> None:
-        self._controller.position = (arg.x, arg.y)
+        MOUSE_CONTROLLER.position = (arg.x, arg.y)
         time.sleep(arg.duration)
-        # pyautogui duration粒度不够，最小好像只能0.1秒
-        # pyautogui.moveTo(move_arg.x, move_arg.y, duration=move_arg.duration)
 
 
 @singleton
@@ -234,8 +230,8 @@ class SimpleDragExecutor(CommandExecutor):
 
 @singleton
 class SimpleCommandExecutor(CommandExecutor):
-    def execute(self, context: ScriptInfo, arg: str) -> None:
-        bat_file_path = Path(context.path) / arg
+    def execute(self, context: ScriptInfo, arg: Any) -> None:
+        bat_file_path = Path(context.path) / str(arg)
         print(
             f"执行批处理文件: {bat_file_path}"
         )  # print 会被重定向到图形界面 脚本运行状态 文本框
@@ -253,23 +249,23 @@ class SimpleCommandExecutor(CommandExecutor):
 
 @singleton
 class SimpleJustLeftClickExecutor(CommandExecutor):
-    def execute(self, context: ScriptInfo, arg: str) -> None:
+    def execute(self, context: ScriptInfo, arg: Any) -> None:
         pyautogui.click()
 
 
 @singleton
 class SimpleJustRightClickExecutor(CommandExecutor):
-    def execute(self, context: ScriptInfo, arg: str) -> None:
-        pyautogui.click(button='right')
+    def execute(self, context: ScriptInfo, arg: Any) -> None:
+        pyautogui.click()
 
 
 @singleton
 class SimpleJustLeftPressExecutor(CommandExecutor):
-    def execute(self, context: ScriptInfo, arg: str) -> None:
-        pyautogui.press('left')
+    def execute(self, context: ScriptInfo, arg: Any) -> None:
+        MOUSE_CONTROLLER.press(Button.left)
 
 
 @singleton
 class SimpleJustRightPressExecutor(CommandExecutor):
-    def execute(self, context: ScriptInfo, arg: str) -> None:
-        pyautogui.press('right')
+    def execute(self, context: ScriptInfo, arg: Any) -> None:
+        MOUSE_CONTROLLER.press(Button.right)
