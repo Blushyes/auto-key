@@ -10,6 +10,16 @@ from script_loader.excel import ExcelLoader
 from script_loader.interfaces import ScriptLoader
 
 
+BANNER = """
+    _         _          _  __          
+   / \  _   _| |_ ___   | |/ /___ _   _ 
+  / _ \| | | | __/ _ \  | ' // _ \ | | |
+ / ___ \ |_| | || (_) | | . \  __/ |_| |
+/_/   \_\__,_|\__\___/  |_|\_\___|\__, |
+                                  |___/ 
+"""
+
+
 class Command:
     EXIT: str = "exit"
 
@@ -99,7 +109,9 @@ def _record_script():
 
 class CommandLineInteractionLayer(InteractionLayer):
     def start(self) -> None:
+        print(BANNER)
         print("欢迎使用auto-key")
+        print()
         print('你需要干什么呢？')
         print('1. 执行脚本')
         print('2. 录制脚本')
