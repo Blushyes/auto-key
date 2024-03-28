@@ -5,7 +5,7 @@ from pynput import mouse, keyboard
 from pynput.mouse import Button
 
 from executor import ScriptStep
-from executor.external import CommandType
+from executor.external import CommandType, CoordTransformWithDurationArg
 from executor.interfaces import CommandExecutorFactory
 from executor.simple import SimpleCommandExecutorFactory
 from recorder.interfaces import Recorder
@@ -33,12 +33,8 @@ class SimpleRecorder(Recorder):
                 self._executor_factory.create(
                     CommandType.MOVE,
                 ),
-                json.dumps(
-                    {
-                        'x': x,
-                        'y': y,
-                        'duration': (cur_time := time()) - self._pre_time,
-                    }
+                CoordTransformWithDurationArg(
+                    x, y, (cur_time := time()) - self._pre_time
                 ),
             )
         )
@@ -70,12 +66,8 @@ class SimpleRecorder(Recorder):
         self._steps.append(
             ScriptStep(
                 self._executor_factory.create(CommandType.SCROLL),
-                json.dumps(
-                    {
-                        'x': dx,
-                        'y': dy,
-                        'duration': (cur_time := time()) - self._pre_time,
-                    }
+                CoordTransformWithDurationArg(
+                    dx, dy, (cur_time := time()) - self._pre_time
                 ),
             )
         )

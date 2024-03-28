@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABC
+from typing import Any
 
 from executor.external import CommandType
 from script_loader import ScriptInfo
@@ -6,7 +7,7 @@ from script_loader import ScriptInfo
 
 class CommandExecutor(ABC):
     @abstractmethod
-    def execute(self, context: ScriptInfo, arg: str) -> None: ...
+    def execute(self, context: ScriptInfo, arg: Any) -> None: ...
 
 
 class CommandExecutorFactory(ABC):
