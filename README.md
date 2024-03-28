@@ -13,11 +13,13 @@
    ```
 1. 打开`main.py`即可运行
 
-识图点击：
+## 功能演示
+
+### 识图点击
 
 ![alt text](assets/gui.gif)
 
-识图后依偏移量点击：
+### 识图后依偏移量点击
 
 ![alt text](assets/使用偏移量点击（两个记事本的关闭按钮图形一样）.gif)
 
@@ -28,7 +30,7 @@
   > 横向偏移量 offset_x 设置 依 识别到图片后所确认的图片中心位置 横向偏移多少个像素单位，默认值 0 不偏移，直接点击 图片中心位置
   > 纵向偏移量 offset_y 设置 依 识别到图片后所确认的图片中心位置 纵向偏移多少个像素单位，默认值 0 不偏移，直接点击 图片中心位置
 
-模拟快捷键：
+### 模拟快捷键
 
 ![alt text](assets/模拟快捷键.gif)
 
@@ -37,7 +39,7 @@
   > 指令类型 7
   > 内容 设置 快捷键 格式：按键以加号相连，例如：“Win+R”
 
-鼠标长按与拖动
+### 鼠标长按与拖动
 
 ![alt text](assets/拖动.gif)
 
@@ -48,7 +50,7 @@
 > 横向偏移量 offset_x 设置 依 鼠标当前位置 横向偏移多少个像素单位，默认值 0 不偏移，直接在鼠标当前位置长按
 > 纵向偏移量 offset_y 设置 依 鼠标当前位置 纵向偏移多少个像素单位，默认值 0 不偏移，直接在鼠标当前位置长按
 
-调用 CMD
+### 调用 CMD
 
 ![alt text](assets/cmd.gif)
 
@@ -59,7 +61,7 @@
 
 > 你可以通过调用bat，调用Powershell、[KeymouseGo](https://github.com/taojy123/KeymouseGo) 或是其他，完成更复制的自动化。
 
-次要图片功能（同一条指令可指定不同图片）
+### 次要图片功能（同一条指令可指定不同图片）
 
 ![img.png](assets/次要图片脚本.png)
 ![baidu](assets/测试次要图片-百度.gif)
@@ -96,11 +98,11 @@
 ├─📁 context/
 │ ├─📜logging.py
 ├─📁 executor/                  # 规定了脚本执行器接口
-│ └─📁 simple.py/               # 最简单的脚本执行器
+│ └─📁 simple/                  # 最简单的脚本执行器
 │ ├─📜external.py               # 存放外部需要访问的实体类
 ├─📁 interaction/               # 规定了交互接口
-│ ├─📁 command_line.py          # 命令行交互
-│ └─📁 gui.py                   # 图形界面交互
+│ ├─📁 command_line             # 命令行交互
+│ └─📁 gui                      # 图形界面交互
 │ ├─ ├─📄auto_key.ui
 │ ├─ ├─📜main.py
 │ ├─ ├─📜shortcut_handler.py
@@ -112,7 +114,7 @@
 │ └─📁 test_script/
 │ ├─✏️meta.example.json          # meta.json的示例
 └─📁 script_loader/             # 脚本加载器，规定了一些关于脚本加载有关的接口
-  └─📁 excel.py                 # Excel脚本加载器
+  └─📁 excel                    # Excel脚本加载器
 ```
 
 ## 编写脚本
