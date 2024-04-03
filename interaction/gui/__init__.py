@@ -158,7 +158,7 @@ class GuiInteractionLayer(QWidget):
 
         # TODO 可以根据 meta.json 配置脚本类型如：Excel等
         if (
-            self.select_script_index >= len(self.scripts_list)
+            self.select_script_index > len(self.scripts_list)
             or self.select_script_index < 0
         ):
             self.ui.plainTextEdit_script_execute_status.appendPlainText(
