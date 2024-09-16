@@ -1,4 +1,6 @@
 import platform
+import random
+import re
 import subprocess
 import time
 from pathlib import Path
@@ -20,6 +22,7 @@ from executor.external import (
 from executor.interfaces import CommandExecutorFactory, CommandExecutor
 from executor.simple.format_hotkey_string import format_hotkey_string
 from script_loader import ScriptInfo
+from fast_script_utils.time import parse_time_to_ms
 
 # NOTE 用于分隔次要图片，比如arg的图片为hello.png，那么hello-1.png和hello-2.png以及hello_1.png都会被尝试读取坐标
 # NOTE 只要有一张图片能读取到坐标即可返回
@@ -103,6 +106,7 @@ class SimpleCommandExecutorFactory(CommandExecutorFactory):
         self._command_to_executor = {
             CommandType.INPUT: SimpleInputExecutor,
             CommandType.WAIT: SimpleWaitExecutor,
+            CommandType.PAUSE: SimplePauseExecutor,
             CommandType.SCROLL: SimpleScrollExecutor,
             CommandType.HOTKEY: SimpleHotkeyExecutor,
             CommandType.MOVE: SimpleMoveExecutor,
@@ -269,3 +273,50 @@ class SimpleJustLeftPressExecutor(CommandExecutor):
 class SimpleJustRightPressExecutor(CommandExecutor):
     def execute(self, context: ScriptInfo, arg: Any) -> None:
         MOUSE_CONTROLLER.press(Button.right)
+
+
+@singleton
+class SimplePauseExecutor(CommandExecutor):
+    @staticmethod
+    def _parse_time(time_str: str) -> float:
+        if 'random' not in time_str.strip():
+            return parse_time_to_ms(time_str)
+
+        # Handle random cases
+        if 'random(' in time_str and ')' in time_str:
+            # Case: random(10s) or random(1min)
+            match = re.search(r'random\(([^)]+)\)', time_str)
+            if match:
+                inner = match.group(1)
+                if ',' in inner:
+                    # Case: random(1s, 2s)
+                    start, end = map(str.strip, inner.split(','))
+                    start_ms = parse_time_to_ms(start)
+                    end_ms = parse_time_to_ms(end)
+                    return random.uniform(start_ms, end_ms)
+                else:
+                    # Case: random(10s) or random(1min)
+                    max_ms = parse_time_to_ms(inner)
+                    return random.uniform(0, max_ms)
+
+        # Case: 3s + random(1s) or 3s +- random(1s)
+        parts = re.split(r'\s*([+-])\s*', time_str)
+        total_ms = 0
+        for i, part in enumerate(parts):
+            if 'random(' in part:
+                match = re.search(r'random\(([^)]+)\)', part)
+                if match:
+                    random_ms = parse_time_to_ms(match.group(1))
+                    if i > 0 and parts[i - 1] == '-':
+                        total_ms -= random.uniform(0, random_ms)
+                    elif i > 1 and parts[i - 2] == '+-':
+                        total_ms += random.uniform(-random_ms, random_ms)
+                    else:
+                        total_ms += random.uniform(0, random_ms)
+            elif part not in ['+', '-', '+-']:
+                total_ms += parse_time_to_ms(part)
+
+        return total_ms
+
+    def execute(self, context: ScriptInfo, arg: str) -> None:
+        time.sleep(self._parse_time(arg) * 0.001)

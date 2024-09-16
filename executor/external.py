@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, TypeVar
 
 
 class CommandType(Enum):
@@ -10,6 +9,7 @@ class CommandType(Enum):
     RIGHT_CLICK = 'r_click'
     INPUT = 'input'
     WAIT = 'wait'
+    PAUSE = "pause"
     SCROLL = 'scroll'
     HOTKEY = 'key'
     DRAG = 'drag'
