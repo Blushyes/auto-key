@@ -9,6 +9,7 @@ class CommandType(Enum):
     RIGHT_CLICK = 'r_click'
     INPUT = 'input'
     WAIT = 'wait'
+    PAUSE = "pause"
     SCROLL = 'scroll'
     HOTKEY = 'key'
     DRAG = 'drag'
